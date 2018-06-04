@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<GridPane hgap="10" vgap="10" id="GridPane" prefHeight="200" prefWidth="320" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cs0318.MainController">
+    <padding><Insets top="25" right="25" bottom="10" left="25"/></padding>
+    <children>
+        <Button 
+            GridPane.columnIndex="0"
+            GridPane.rowIndex="0"
+            text="Add Customer" 
+            onAction="#addCustomerAction" 
+            fx:id="addCustomerButton"
+        />
+        <Button 
+            GridPane.columnIndex="0"
+            GridPane.rowIndex="1"
+            text="Add Appointment" 
+            onAction="#addAppointmentAction" 
+            fx:id="addAppointmentButton"
+        />
+    </children>
+</GridPane>

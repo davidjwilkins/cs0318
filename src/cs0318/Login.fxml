@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<GridPane hgap="10" vgap="10" id="LoginPane" prefHeight="200" prefWidth="320" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cs0318.LoginController">
+    <padding><Insets top="25" right="25" bottom="10" left="25"/></padding>
+    <children>
+        <Label
+            GridPane.columnIndex="0"
+            GridPane.rowIndex="0"
+            text="Username"
+        />
+        <TextField
+            GridPane.columnIndex="1"
+            GridPane.rowIndex="0"
+            fx:id="userNameText"
+        />
+        <Label
+            GridPane.columnIndex="0"
+            GridPane.rowIndex="1"
+            text="Password"
+        />
+        <PasswordField
+            GridPane.columnIndex="1"
+            GridPane.rowIndex="1"
+            fx:id="passwordText"
+        />
+        <Button
+            text="Login"
+            GridPane.columnIndex="0"
+            GridPane.rowIndex="2"
+            fx:id="loginButton"
+            onAction="#handleLoginAction"
+        />
+    </children>
+</GridPane>
