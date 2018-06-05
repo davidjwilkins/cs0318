@@ -62,6 +62,10 @@ public class Country extends Entity {
     public City getCity(int cityId) {
         return this.cityIds.get(cityId);
     }
+    
+    public ObservableList<City> getCities() {
+        return this.cities;
+    }
     /**
      * @return the countryId
      */

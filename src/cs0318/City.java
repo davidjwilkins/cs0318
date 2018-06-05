@@ -23,8 +23,8 @@ public class City extends Entity {
     private final HashMap<Integer, Address> addressIds;
     
     public City() {
+        this.country = new Country();
         this.addresses = FXCollections.observableArrayList();
-        
         this.addressIds = new HashMap<>();
         addresses.addListener((ListChangeListener<Address>) c -> {
             while (c.next()) {

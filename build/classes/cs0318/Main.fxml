@@ -49,11 +49,28 @@
             GridPane.rowIndex="0"
             onAction="#incrementMonth" 
         />
+        <fx:define>
+            <ToggleGroup fx:id="viewType"/>  
+        </fx:define>
+        <ToggleButton
+            text="Month"
+            fx:id="monthToggle"
+            GridPane.columnIndex="6"
+            GridPane.rowIndex="0"
+            toggleGroup="$viewType"
+        />
+        <ToggleButton
+            text="Week"
+            fx:id="weekToggle"
+            GridPane.columnIndex="7"
+            GridPane.rowIndex="0"
+            toggleGroup="$viewType"
+        />
         <GridPane
             fx:id="calendarGrid"
             GridPane.columnIndex="1"
             GridPane.rowIndex="1"
-            GridPane.columnSpan="4"
+            GridPane.columnSpan="7"
         />
     </children>
 </GridPane>

@@ -5,6 +5,8 @@
  */
 package cs0318;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author david.wilkins
@@ -14,9 +16,11 @@ public class Context {
     protected User user;
     protected Appointment appointment;
     protected Customer customer;
+    protected ArrayList<Country> countries;
     
     private Context() {
-        if (instance == null) this.instance = this;        
+        if (instance == null) this.instance = this;       
+        this.countries = new ArrayList<>();
     }
     
     public static Context getInstance()
@@ -25,6 +29,14 @@ public class Context {
             instance = new Context();
  
         return instance;
+    }
+    
+    public void setCountries(ArrayList<Country> countries) {
+        this.countries = countries;
+    }
+    
+    public ArrayList<Country> getCountries() {
+        return this.countries;
     }
     
     public void setAppointment(Appointment appointment) {

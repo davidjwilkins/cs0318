@@ -48,7 +48,7 @@
             fx:id="address2Label"
             text="Address 2"
         />
-        <TextArea 
+        <TextField 
             GridPane.columnIndex="1"
             GridPane.rowIndex="3"
             fx:id="address2Text"

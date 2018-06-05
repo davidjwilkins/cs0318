@@ -73,6 +73,7 @@ public class AppointmentController extends SceneChangerController implements Ini
         app.setCustomer((Customer) customerSelect.getValue());
         app.setUser(c.getUser());
         c.getUser().addAppointment(app);
+        this.setScene("Main");
     }    
     
     @Override

@@ -27,6 +27,7 @@ public class Address extends Entity {
     
     
     public Address() {
+        this.city = new City();
         this.customers = FXCollections.observableArrayList();
         this.customerIds = new HashMap<>();
         customers.addListener((ListChangeListener<Customer>) c -> {

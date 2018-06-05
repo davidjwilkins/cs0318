@@ -26,6 +26,7 @@ public class Customer extends Entity {
     public Customer() {
         this.appointments = FXCollections.observableArrayList();
         this.appointmentIds = new HashMap<>();
+        this.address = new Address();
         appointments.addListener((ListChangeListener<Appointment>) c -> {
             while (c.next()) {
                 if (c.wasPermutated()) {
