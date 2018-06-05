@@ -34,7 +34,7 @@ public class LoginController extends SceneChangerController implements Initializ
         User user = new User();
         user.setUserName(userNameText.getText().trim());
         user.setPassword(passwordText.getText());
-        
+        Context.getInstance().setUser(user);
         loginButton.setDisable(true);
         loginButton.setText("Logging in...");
         this.setScene("Main");

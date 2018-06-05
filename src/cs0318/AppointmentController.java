@@ -91,10 +91,15 @@ public class AppointmentController extends SceneChangerController implements Ini
         typeText.setText(app.getType());
         urlText.setText(app.getUrl());
         descriptionText.setText(app.getDescription());
-        LocalDate start = app.getStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate end = app.getEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        startDate.setValue(start);
-        endDate.setValue(end);
+        
+        if(app.getStart() != null) {
+            LocalDate start = app.getStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            startDate.setValue(start);
+        }
+        if (app.getEnd() != null) {
+            LocalDate end = app.getEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            endDate.setValue(end);
+        }
         customerSelect.setValue(app.getCustomer());
     }
 }

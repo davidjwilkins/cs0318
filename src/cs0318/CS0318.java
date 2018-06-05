@@ -33,15 +33,15 @@ public class CS0318 extends Application {
         FXMLLoader customerLoader = new FXMLLoader(getClass().getResource("Customer.fxml"));
         FXMLLoader appointmentLoader = new FXMLLoader(getClass().getResource("Appointment.fxml"));
         
-        mainController = ((MainController)mainLoader.getController());
-        loginController = ((LoginController)loginLoader.getController());
-        customerController = ((CustomerController)customerLoader.getController());
-        appointmentController = ((AppointmentController)appointmentLoader.getController());
-        
         scenes.put("Main", (Parent)mainLoader.load());
         scenes.put("Login", (Parent)loginLoader.load());
         scenes.put("Customer", (Parent)customerLoader.load());
         scenes.put("Appointment", (Parent)appointmentLoader.load());
+        
+        mainController = ((MainController)mainLoader.getController());
+        loginController = ((LoginController)loginLoader.getController());
+        customerController = ((CustomerController)customerLoader.getController());
+        appointmentController = ((AppointmentController)appointmentLoader.getController());
         
         mainController.setSceneChanger(s -> this.setScene(s));
         loginController.setSceneChanger(s -> this.setScene(s));
@@ -64,18 +64,17 @@ public class CS0318 extends Application {
             if (!scenes.containsKey(name)) {
                 throw new Exception(name + " not found in Scene list");
             }
-            Parent root = scenes.get(name);
-            SceneChangerController controller = controllers.get(name);
-            controller.refresh();
-            scene.setRoot(root);
-            stage.sizeToScene();
-            
-        } catch (Exception e) {
+       } catch (Exception e) {
             Alert errorAlert = new Alert(Alert.AlertType.ERROR);
             errorAlert.setHeaderText("Scene not valid");
             errorAlert.setContentText(e.getMessage());
             errorAlert.showAndWait();
         }
+        Parent root = scenes.get(name);
+        SceneChangerController controller = controllers.get(name);
+        controller.refresh();
+        scene.setRoot(root);
+        stage.sizeToScene();
     }
     /**
      * @param args the command line arguments

@@ -6,7 +6,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
-<GridPane hgap="10" vgap="10" id="GridPane" prefHeight="200" prefWidth="320" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cs0318.MainController">
+<?import javafx.collections.FXCollections?>
+<GridPane hgap="10" vgap="10" id="GridPane" prefHeight="400" prefWidth="600" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cs0318.MainController">
     <padding><Insets top="25" right="25" bottom="10" left="25"/></padding>
     <children>
         <Button 
@@ -22,6 +23,37 @@
             text="Add Appointment" 
             onAction="#addAppointmentAction" 
             fx:id="addAppointmentButton"
+        />
+        
+        <Button
+            text="←"
+            GridPane.columnIndex="2"
+            GridPane.rowIndex="0"
+            onAction="#decrementMonth" 
+        />
+        <Label
+            fx:id="monthLabel"
+            text="Month"
+            GridPane.columnIndex="3"
+            GridPane.rowIndex="0"
+        />
+        <Label
+            fx:id="yearLabel"
+            text="Year"
+            GridPane.columnIndex="4"
+            GridPane.rowIndex="0"
+        />
+        <Button
+            text="→"
+            GridPane.columnIndex="5"
+            GridPane.rowIndex="0"
+            onAction="#incrementMonth" 
+        />
+        <GridPane
+            fx:id="calendarGrid"
+            GridPane.columnIndex="1"
+            GridPane.rowIndex="1"
+            GridPane.columnSpan="4"
         />
     </children>
 </GridPane>
