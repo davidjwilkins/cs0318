@@ -49,12 +49,12 @@ public class User extends Entity {
     }
     
     public void addAppointment(Appointment appointment) {
-        if (this.appointmentIds.containsKey(appointment.getAppointmentId())) {
-            return;
+        if (!appointment.getUser().equals(this)) {
+            appointment.setUser(this);
         }
-        appointment.setUserId(this.userId);
-        appointment.setUser(this);
-        this.appointments.add(appointment);
+        if (!this.appointments.contains(appointment)) {
+            this.appointments.add(appointment);
+        }
     }
     
     public Appointment getAppointment(int appointmentId) {

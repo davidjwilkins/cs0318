@@ -22,16 +22,23 @@ public class MainController extends SceneChangerController implements Initializa
     
     @FXML
     private void addAppointmentAction(ActionEvent event) {
+        Context.getInstance().setAppointment(new Appointment());
         this.setScene("Appointment");
     }
     
     @FXML
     private void addCustomerAction(ActionEvent event) {
+        Context.getInstance().setCustomer(new Customer());
         this.setScene("Customer");
     }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-    }    
+    }
+    
+    @Override
+    protected void refresh() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

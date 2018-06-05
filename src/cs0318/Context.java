@@ -12,7 +12,8 @@ package cs0318;
 public class Context {
     protected static Context instance = null;
     protected User user;
-    
+    protected Appointment appointment;
+    protected Customer customer;
     
     private Context() {
         if (instance == null) this.instance = this;        
@@ -24,5 +25,29 @@ public class Context {
             instance = new Context();
  
         return instance;
+    }
+    
+    public void setAppointment(Appointment appointment) {
+        this.appointment = appointment;
+    }
+    
+    public Appointment getAppointment() {
+        return appointment;
+    }
+    
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+    
+    public Customer getCustomer() {
+        return customer;
+    }
+    
+    public void setUser(User user) {
+        this.user = user;
+    }
+    
+    public User getUser() {
+        return user;
     }
 }

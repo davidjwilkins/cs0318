@@ -13,6 +13,7 @@ import java.util.function.Consumer;
  */
 abstract public class SceneChangerController implements SceneChangerInterface {
     protected Consumer<String> sceneChanger;
+    protected Context context;
     @Override
     public void setSceneChanger(Consumer<String> sceneChanger) {
         this.sceneChanger = sceneChanger;
@@ -20,4 +21,13 @@ abstract public class SceneChangerController implements SceneChangerInterface {
     public void setScene(String scene) {
         this.sceneChanger.accept(scene);
     }
+    public void setContext(Context context) {
+        this.context = context;
+    }
+    
+    protected Context getContext() {
+        return this.context;
+    }
+    
+    abstract protected void refresh();
 }

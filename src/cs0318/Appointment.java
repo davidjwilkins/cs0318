@@ -44,6 +44,7 @@ public class Appointment extends Entity {
         this.customer = customer;
         if (customer != null) {
             this.setCustomerId(customer.getCustomerId());
+            customer.addAppointment(this);
         } else {
             this.setCustomerId(0);
         }

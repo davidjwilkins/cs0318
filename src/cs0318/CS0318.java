@@ -21,21 +21,38 @@ public class CS0318 extends Application {
     protected Scene scene;
     protected Stage stage;
     protected HashMap<String, Parent> scenes;
+    protected HashMap<String, SceneChangerController> controllers;
+
     @Override
     public void start(Stage stage) throws Exception {
-        scenes = new HashMap<String, Parent>();
+        SceneChangerController appointmentController, customerController, loginController, mainController;
+        scenes = new HashMap<>();
+        controllers = new HashMap<>();
         FXMLLoader mainLoader = new FXMLLoader(getClass().getResource("Main.fxml"));
         FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("Login.fxml"));
         FXMLLoader customerLoader = new FXMLLoader(getClass().getResource("Customer.fxml"));
         FXMLLoader appointmentLoader = new FXMLLoader(getClass().getResource("Appointment.fxml"));
+        
+        mainController = ((MainController)mainLoader.getController());
+        loginController = ((LoginController)loginLoader.getController());
+        customerController = ((CustomerController)customerLoader.getController());
+        appointmentController = ((AppointmentController)appointmentLoader.getController());
+        
         scenes.put("Main", (Parent)mainLoader.load());
-        ((MainController)mainLoader.getController()).setSceneChanger(s -> this.setScene(s));
         scenes.put("Login", (Parent)loginLoader.load());
-        ((LoginController)loginLoader.getController()).setSceneChanger(s -> this.setScene(s));
         scenes.put("Customer", (Parent)customerLoader.load());
-        ((CustomerController)customerLoader.getController()).setSceneChanger(s -> this.setScene(s));
         scenes.put("Appointment", (Parent)appointmentLoader.load());
-        ((AppointmentController)appointmentLoader.getController()).setSceneChanger(s -> this.setScene(s));
+        
+        mainController.setSceneChanger(s -> this.setScene(s));
+        loginController.setSceneChanger(s -> this.setScene(s));
+        customerController.setSceneChanger(s -> this.setScene(s));
+        appointmentController.setSceneChanger(s -> this.setScene(s));
+        
+        controllers.put("Main", mainController);
+        controllers.put("Login", loginController);
+        controllers.put("Customer", customerController);
+        controllers.put("Appointment", appointmentController);
+        
         scene = new Scene(scenes.get("Login"));
         stage.setScene(scene);
         stage.show();
@@ -48,6 +65,8 @@ public class CS0318 extends Application {
                 throw new Exception(name + " not found in Scene list");
             }
             Parent root = scenes.get(name);
+            SceneChangerController controller = controllers.get(name);
+            controller.refresh();
             scene.setRoot(root);
             stage.sizeToScene();
             

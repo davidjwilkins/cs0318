@@ -38,6 +38,7 @@ public class LoginController extends SceneChangerController implements Initializ
         loginButton.setDisable(true);
         loginButton.setText("Logging in...");
         this.setScene("Main");
+        
     }
     
     @Override
@@ -50,5 +51,10 @@ public class LoginController extends SceneChangerController implements Initializ
         errorAlert.setHeaderText(title);
         errorAlert.setContentText(e.getMessage());
         errorAlert.showAndWait();
+    }    
+    
+    @Override
+    protected void refresh() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

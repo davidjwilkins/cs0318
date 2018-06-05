@@ -34,5 +34,10 @@ public class CustomerController extends SceneChangerController implements Initia
     @FXML
     private void handleSaveAction(ActionEvent event) {
         this.setScene("Main");
+    }    
+    
+    @Override
+    protected void refresh() {
+        
     }
 }

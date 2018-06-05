@@ -58,7 +58,12 @@ public class Customer extends Entity {
     }
     
     public void addAppointment(Appointment appointment) {
-        this.appointments.add(appointment);
+        if (!this.appointments.contains(appointment)) {
+            this.appointments.add(appointment);
+        }
+        if (!appointment.getCustomer().equals(this)) {
+            appointment.setCustomer(this);
+        }
     }
     
     public void deleteAppointment(Appointment appointment) {
