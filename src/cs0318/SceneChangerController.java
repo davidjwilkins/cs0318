@@ -6,6 +6,7 @@
 package cs0318;
 
 import java.util.function.Consumer;
+import javafx.scene.control.Alert;
 
 /**
  *
@@ -29,5 +30,11 @@ abstract public class SceneChangerController implements SceneChangerInterface {
         return this.context;
     }
     
+    protected void errorMessage(String title, Exception e) {
+        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+        errorAlert.setHeaderText(title);
+        errorAlert.setContentText(e.getMessage());
+        errorAlert.showAndWait();
+    }    
     abstract protected void refresh();
 }

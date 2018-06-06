@@ -34,12 +34,17 @@ public class DB {
             statements.put("login", connection.prepareStatement("SELECT * FROM user WHERE userName=? AND password=?"));
             statements.put("countries", connection.prepareStatement("SELECT * FROM country"));
             statements.put("cities", connection.prepareStatement("SELECT * FROM city"));
-            statements.put("customer", connection.prepareStatement("INSERT INTO customer(customerId, customerName, addressId, active, createDate, createdBy, lastUpdateBy) VALUES(?, ?, ?, ?, NOW(), ?, '') "
-                    + "ON DUPLICATE KEY UPDATE customerName = VALUES(customerId), addressId = VALUES(addressId), active = VALUES(active), lastUpdate = NOW(), lastUpdateBy = "
-                    + "VALUES(createdBy)", Statement.RETURN_GENERATED_KEYS));
-            statements.put("address", connection.prepareStatement("INSERT INTO address(addressId, address, address2, cityId, postalCode, phone, createDate, createdBy, lastUpdateBy) "
-                    + "VALUES(?, ?, ?, ?, ?, ?, NOW(), ?, '') ON DUPLICATE KEY UPDATE address = VALUES(address), addressId = VALUES(addressId), address2 = VALUES(address2), "
-                    + "postalCode = VALUES(postalCode), phone = VALUES(phone), lastUpdate = NOW(), lastUpdateBy = VALUES(createdBy)", Statement.RETURN_GENERATED_KEYS));
+            statements.put("customers", connection.prepareStatement("SELECT * FROM customer"));
+            statements.put("addresses", connection.prepareStatement("SELECT * FROM address"));
+            statements.put("appointments", connection.prepareStatement("SELECT * FROM appointments"));
+            statements.put("insertCustomer", connection.prepareStatement("INSERT INTO customer(customerName, addressId, active, createDate, createdBy, lastUpdateBy) "
+                    + "VALUES(?, ?, ?, NOW(), ?, '')", Statement.RETURN_GENERATED_KEYS));
+            statements.put("updateCustomer", connection.prepareStatement("UPDATE customers SET customerName = ?, addressId = ?, active = ?, lastUpdate = NOW(), lastUpdatedBy = ? "
+                    + "WHERE id = ?"));
+            statements.put("insertAddress", connection.prepareStatement("INSERT INTO address(address, address2, cityId, postalCode, phone, createDate, createdBy, lastUpdateBy) "
+                    + "VALUES(?, ?, ?, ?, ?, NOW(), ?, '')", Statement.RETURN_GENERATED_KEYS)); 
+            statements.put("updateAddress", connection.prepareStatement("UPDATE address SET address = ?, address2 = ?, postalCode = ?, phone = ?, "
+                    + "postalCode = ?, lastUpdate = NOW(), lastUpdateBy = ? WHERE id = ?"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -73,44 +78,63 @@ public class DB {
     }
     
     public void upsertCustomer(Customer customer) throws SQLException, Exception {
-        PreparedStatement s = (PreparedStatement) statements.get("customer");
-        //customerId, customerName, addressId, active, NOW(), createdBy
-        s.setInt(1, customer.getCustomerId());
-        s.setString(2, customer.getCustomerName());
-        s.setInt(3, customer.getAddress().getAddressId());
-        s.setBoolean(4, customer.isActive());
-        s.setString(5, Context.getInstance().getUser().getUserName());
-        s.executeUpdate();
-        ResultSet exists = s.getGeneratedKeys();
-        if(exists.next()){
-            customer.setAddressId(exists.getInt(1));
+        PreparedStatement s;
+        if (customer.getCustomerId() == 0) {
+            s = (PreparedStatement) statements.get("insertCustomer");
         } else {
-            throw new Exception("Could not create/update customer");
+            s = (PreparedStatement) statements.get("updateCustomer");
+            s.setInt(5, customer.getCustomerId());
         }
+            //customerName, addressId, active, NOW(), createdBy
+        s.setString(1, customer.getCustomerName());
+        s.setInt(2, customer.getAddress().getAddressId());
+        s.setBoolean(3, customer.isActive());
+        s.setString(4, Context.getInstance().getUser().getUserName());
+        s.executeUpdate();
+        if (customer.getCustomerId() == 0) {
+            ResultSet exists = s.getGeneratedKeys();
+            System.out.println(exists);
+            if(exists.next()){
+                customer.setAddressId(exists.getInt(1));
+            } else {
+                throw new Exception("Could not create/update customer");
+            }
+        }
+        Context.getInstance().addCustomer(customer);
     }
     
     public void upsertAddress(Address address) throws SQLException, Exception {
-        PreparedStatement s = (PreparedStatement) statements.get("address");
-        //(addressId, address, address2, cityId, postalCode, phone, NOW(), createdBy
-        s.setInt(1, address.getAddressId());
-        s.setString(2, address.getAddress());
-        s.setString(3, address.getAddress2());
-        s.setInt(4, address.getCityId());
-        s.setString(5, address.getPostalCode());
-        s.setString(6, address.getPhone());
-        s.setString(7, Context.getInstance().getUser().getUserName());
-        s.executeUpdate();
-        ResultSet exists = s.getGeneratedKeys();
-        if(exists.next()){
-            address.setAddressId(exists.getInt(1));
+        PreparedStatement s;
+        if (address.getAddressId() == 0) {
+            s = (PreparedStatement) statements.get("insertAddress");
         } else {
-            throw new Exception("Could not create/update address");
+            s = (PreparedStatement) statements.get("updateAddress");
+            s.setInt(7, address.getAddressId());
+        }
+        s.setString(1, address.getAddress());
+        s.setString(2, address.getAddress2());
+        s.setInt(3, address.getCityId());
+        s.setString(4, address.getPostalCode());
+        s.setString(5, address.getPhone());
+        s.setString(6, Context.getInstance().getUser().getUserName());
+        s.executeUpdate();
+        if (address.getAddressId() == 0) {
+            ResultSet exists = s.getGeneratedKeys();
+            System.out.println(exists);
+            if(exists.next()){
+                address.setAddressId(exists.getInt(1));
+            } else {
+                System.out.println(exists);
+                throw new Exception("Could not create/update address");
+            }
         }
     }
     
     protected void populate() throws SQLException, Exception {
         PreparedStatement countriesQuery = (PreparedStatement) statements.get("countries");
         PreparedStatement citiesQuery = (PreparedStatement) statements.get("cities");
+        PreparedStatement addressesQuery = (PreparedStatement) statements.get("addresses");
+        PreparedStatement customersQuery = (PreparedStatement) statements.get("customers");
         Context context = Context.getInstance();
         
         ResultSet countries = countriesQuery.executeQuery();
@@ -123,6 +147,7 @@ public class DB {
             countryMap.put(c.getCountryId(), c);
         }
         
+        HashMap<Integer, City> cityMap = new HashMap<>();
         ResultSet cities = citiesQuery.executeQuery();
         while(cities.next()) {
             City c = new City();
@@ -131,6 +156,48 @@ public class DB {
             c.setCountryId(countryId);
             c.setCity(cities.getString("city"));
             ((Country) countryMap.get(countryId)).addCity(c);
+            cityMap.put(c.getCityId(), c);
+        }
+        
+        HashMap<Integer, Address> addressMap = new HashMap<>();
+        ResultSet addresses = addressesQuery.executeQuery();
+        while(addresses.next()) {
+            Address a = new Address();
+            Integer addressId = addresses.getInt("addressId");
+            a.setAddressId(addressId);
+            a.setAddress(addresses.getString("address"));
+            a.setAddress2(addresses.getString("address2"));
+            a.setCityId(addresses.getInt("cityId"));
+            a.setCity(cityMap.get(a.getCityId()));
+            a.setPhone(addresses.getString("phone"));
+            a.setPostalCode(addresses.getString("postalCode"));
+            addressMap.put(a.getAddressId(), a);
+        }
+        
+        HashMap<Integer, Customer> customerMap = new HashMap<>();
+        ResultSet customers = customersQuery.executeQuery();
+        while(customers.next()) {
+            Customer c = new Customer();
+            Integer customerId = customers.getInt("customerId");
+            c.setCustomerId(customerId);
+            c.setActive(customers.getBoolean("active"));
+            c.setAddressId(customers.getInt("addressId"));
+            c.setAddress(addressMap.get(c.getAddressId()));
+            c.setCustomerName(customers.getString("customer"));
+            customerMap.put(customerId, c);
+        }
+        
+        HashMap<Integer, Appointment> customerMap = new HashMap<>();
+        ResultSet customers = customersQuery.executeQuery();
+        while(customers.next()) {
+            Customer c = new Customer();
+            Integer customerId = customers.getInt("customerId");
+            c.setCustomerId(customerId);
+            c.setActive(customers.getBoolean("active"));
+            c.setAddressId(customers.getInt("addressId"));
+            c.setAddress(addressMap.get(c.getAddressId()));
+            c.setCustomerName(customers.getString("customer"));
+            customerMap.put(customerId, c);
         }
     }
     //Closes connections

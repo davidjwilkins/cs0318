@@ -59,13 +59,6 @@ public class LoginController extends SceneChangerController implements Initializ
         this.db = DB.connect();
     }    
     
-    private void errorMessage(String title, Exception e) {
-        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-        errorAlert.setHeaderText(title);
-        errorAlert.setContentText(e.getMessage());
-        errorAlert.showAndWait();
-    }    
-    
     @Override
     protected void refresh() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

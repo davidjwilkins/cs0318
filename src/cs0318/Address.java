@@ -15,13 +15,13 @@ import javafx.collections.ListChangeListener;
  * @author david.wilkins
  */
 public class Address extends Entity {
-    private int addressId;
-    private String address;
-    private String address2;
-    private int cityId;
+    private int addressId = 0;
+    private String address = "";
+    private String address2 = "";
+    private int cityId = 0;
     protected City city;
-    private String postalCode;
-    private String phone;
+    private String postalCode = "";
+    private String phone = "";
     private final ObservableList<Customer> customers;
     private final HashMap<Integer, Customer> customerIds;
     

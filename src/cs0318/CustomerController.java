@@ -6,6 +6,7 @@
 package cs0318;
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -69,6 +70,17 @@ public class CustomerController extends SceneChangerController implements Initia
         address.setCity((City) citySelect.getValue());
         address.setPostalCode(postalCodeText.getText());
         address.setPhone(phoneText.getText());
+        try {
+            DB.connect().upsertAddress(address);
+            customer.setCustomerName(nameText.getText());
+            customer.setAddress(address);
+            DB.connect().upsertCustomer(customer);
+        } catch(SQLException e) {
+            errorMessage("Could not save customer", e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            errorMessage("Unknown error", e);
+        }
         this.setScene("Main");
     }    
     
