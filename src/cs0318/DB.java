@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 
 public class DB {
@@ -33,6 +34,12 @@ public class DB {
             statements.put("login", connection.prepareStatement("SELECT * FROM user WHERE userName=? AND password=?"));
             statements.put("countries", connection.prepareStatement("SELECT * FROM country"));
             statements.put("cities", connection.prepareStatement("SELECT * FROM city"));
+            statements.put("customer", connection.prepareStatement("INSERT INTO customer(customerId, customerName, addressId, active, createDate, createdBy, lastUpdateBy) VALUES(?, ?, ?, ?, NOW(), ?, '') "
+                    + "ON DUPLICATE KEY UPDATE customerName = VALUES(customerId), addressId = VALUES(addressId), active = VALUES(active), lastUpdate = NOW(), lastUpdateBy = "
+                    + "VALUES(createdBy)", Statement.RETURN_GENERATED_KEYS));
+            statements.put("address", connection.prepareStatement("INSERT INTO address(addressId, address, address2, cityId, postalCode, phone, createDate, createdBy, lastUpdateBy) "
+                    + "VALUES(?, ?, ?, ?, ?, ?, NOW(), ?, '') ON DUPLICATE KEY UPDATE address = VALUES(address), addressId = VALUES(addressId), address2 = VALUES(address2), "
+                    + "postalCode = VALUES(postalCode), phone = VALUES(phone), lastUpdate = NOW(), lastUpdateBy = VALUES(createdBy)", Statement.RETURN_GENERATED_KEYS));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -62,6 +69,42 @@ public class DB {
             populate();
         } else {
             throw new Exception("This username/password combination does not exist");
+        }
+    }
+    
+    public void upsertCustomer(Customer customer) throws SQLException, Exception {
+        PreparedStatement s = (PreparedStatement) statements.get("customer");
+        //customerId, customerName, addressId, active, NOW(), createdBy
+        s.setInt(1, customer.getCustomerId());
+        s.setString(2, customer.getCustomerName());
+        s.setInt(3, customer.getAddress().getAddressId());
+        s.setBoolean(4, customer.isActive());
+        s.setString(5, Context.getInstance().getUser().getUserName());
+        s.executeUpdate();
+        ResultSet exists = s.getGeneratedKeys();
+        if(exists.next()){
+            customer.setAddressId(exists.getInt(1));
+        } else {
+            throw new Exception("Could not create/update customer");
+        }
+    }
+    
+    public void upsertAddress(Address address) throws SQLException, Exception {
+        PreparedStatement s = (PreparedStatement) statements.get("address");
+        //(addressId, address, address2, cityId, postalCode, phone, NOW(), createdBy
+        s.setInt(1, address.getAddressId());
+        s.setString(2, address.getAddress());
+        s.setString(3, address.getAddress2());
+        s.setInt(4, address.getCityId());
+        s.setString(5, address.getPostalCode());
+        s.setString(6, address.getPhone());
+        s.setString(7, Context.getInstance().getUser().getUserName());
+        s.executeUpdate();
+        ResultSet exists = s.getGeneratedKeys();
+        if(exists.next()){
+            address.setAddressId(exists.getInt(1));
+        } else {
+            throw new Exception("Could not create/update address");
         }
     }
     
