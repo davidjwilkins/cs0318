@@ -47,8 +47,12 @@ public class CustomerController extends SceneChangerController implements Initia
                 Country country = (Country) countrySelect.getItems().get((Integer) newValue);
                 citySelect.setValue(null);
                 citySelect.setItems(country.getCities());
+                citySelect.setDisable(false);
+                Context.getInstance().setCountry(country);
             }
         });
+        countrySelect.setConverter(new CountryStringConverter());
+        citySelect.setConverter(new CityStringConverter());
     }    
     
     @FXML
@@ -88,6 +92,11 @@ public class CustomerController extends SceneChangerController implements Initia
             citySelect.setItems(c.getAddress().getCity().getCountry().getCities());
             citySelect.setValue(c.getAddress().getCity());
             countrySelect.setValue(c.getAddress().getCity().getCountry());
+            if (c.getAddress().getCity().getCountry().getCountryId() == 0) {
+                citySelect.setDisable(true);
+            } else {
+                citySelect.setDisable(false);
+            }
         }
     }
 }

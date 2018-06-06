@@ -8,7 +8,6 @@ package cs0318;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import static java.time.temporal.TemporalQueries.localDate;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -102,5 +101,6 @@ public class AppointmentController extends SceneChangerController implements Ini
             endDate.setValue(end);
         }
         customerSelect.setValue(app.getCustomer());
+        customerSelect.setItems(Context.getInstance().getCustomers());
     }
 }

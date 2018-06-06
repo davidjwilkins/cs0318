@@ -6,6 +6,9 @@
 package cs0318;
 
 import java.net.URL;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -29,21 +32,31 @@ public class LoginController extends SceneChangerController implements Initializ
     @FXML
     private Button loginButton;
     
+    private DB db;
+    
     @FXML
     private void handleLoginAction(ActionEvent event) {
         User user = new User();
         user.setUserName(userNameText.getText().trim());
         user.setPassword(passwordText.getText());
-        Context.getInstance().setUser(user);
         loginButton.setDisable(true);
+        String originalText = loginButton.getText();
         loginButton.setText("Logging in...");
-        this.setScene("Main");
-        
+        try {
+            db.login(user);
+            this.setScene("Main");
+        } catch (SQLException e) {
+            errorMessage("Could not connect to database", e);
+        } catch (Exception e) {
+            errorMessage("Invalid Login", e);
+        }
+        loginButton.setText(originalText);
+        loginButton.setDisable(false);
     }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        this.db = DB.connect();
     }    
     
     private void errorMessage(String title, Exception e) {

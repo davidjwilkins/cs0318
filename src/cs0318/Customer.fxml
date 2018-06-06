@@ -53,27 +53,28 @@
             GridPane.rowIndex="3"
             fx:id="address2Text"
         />
+
         <Label
             GridPane.columnIndex="0"
             GridPane.rowIndex="4"
-            fx:id="cityLabel"
-            text="City"
-        />
-        <ChoiceBox 
-            GridPane.columnIndex="1"
-            GridPane.rowIndex="4"
-            fx:id="citySelect"
-        />
-        <Label
-            GridPane.columnIndex="0"
-            GridPane.rowIndex="5"
             fx:id="countryLabel"
             text="Country"
         />
         <ChoiceBox 
             GridPane.columnIndex="1"
-            GridPane.rowIndex="5"
+            GridPane.rowIndex="4"
             fx:id="countrySelect"
+        />
+        <Label
+            GridPane.columnIndex="0"
+            GridPane.rowIndex="5"
+            fx:id="cityLabel"
+            text="City"
+        />
+        <ChoiceBox 
+            GridPane.columnIndex="1"
+            GridPane.rowIndex="5"
+            fx:id="citySelect"
         />
         <Label
             GridPane.columnIndex="0"

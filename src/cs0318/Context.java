@@ -6,7 +6,9 @@
 package cs0318;
 
 import java.util.ArrayList;
-
+import java.util.HashMap;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 /**
  *
  * @author david.wilkins
@@ -17,6 +19,9 @@ public class Context {
     protected Appointment appointment;
     protected Customer customer;
     protected ArrayList<Country> countries;
+    protected ObservableList<Customer> customers;
+    protected HashMap<Integer, Country> countryIds;
+    protected Country country;
     
     private Context() {
         if (instance == null) this.instance = this;       
@@ -31,12 +36,36 @@ public class Context {
         return instance;
     }
     
+    public void setCountry(Country country) {
+        this.country = country;
+    }
+    
+    public Country getCountry() {
+        return this.country;
+    }
+    
     public void setCountries(ArrayList<Country> countries) {
         this.countries = countries;
     }
     
     public ArrayList<Country> getCountries() {
         return this.countries;
+    }
+    
+    public void setCustomers(ArrayList<Customer> customers) {
+        this.customers = FXCollections.observableArrayList(customers);
+    }
+    
+    public void addCustomer(Customer customer) {
+        this.customers.add(customer);
+    }
+    
+    public void removeCustomer(Customer customer) {
+        this.customers.remove(customer);
+    }
+    
+    public ObservableList<Customer> getCustomers() {
+        return this.customers;
     }
     
     public void setAppointment(Appointment appointment) {
