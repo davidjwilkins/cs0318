@@ -13,7 +13,7 @@
         <Label
             GridPane.columnIndex="0"
             GridPane.rowIndex="0"
-            text="Username"
+            text="%username"
         />
         <TextField
             GridPane.columnIndex="1"
@@ -23,7 +23,7 @@
         <Label
             GridPane.columnIndex="0"
             GridPane.rowIndex="1"
-            text="Password"
+            text="%password"
         />
         <PasswordField
             GridPane.columnIndex="1"
@@ -31,7 +31,7 @@
             fx:id="passwordText"
         />
         <Button
-            text="Login"
+            text="%login"
             GridPane.columnIndex="0"
             GridPane.rowIndex="2"
             fx:id="loginButton"

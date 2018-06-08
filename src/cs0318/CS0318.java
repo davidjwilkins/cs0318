@@ -12,6 +12,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.ResourceBundle;
 /**
  *
  * @author david.wilkins
@@ -25,14 +27,18 @@ public class CS0318 extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        Locale english = new Locale("en", "EN");
         SceneChangerController appointmentController, customerController, loginController, mainController;
         scenes = new HashMap<>();
         controllers = new HashMap<>();
         FXMLLoader mainLoader = new FXMLLoader(getClass().getResource("Main.fxml"));
+        mainLoader.setResources(ResourceBundle.getBundle("resources.main", english));
         FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("Login.fxml"));
+        loginLoader.setResources(ResourceBundle.getBundle("resources.login", english));
         FXMLLoader customerLoader = new FXMLLoader(getClass().getResource("Customer.fxml"));
+        customerLoader.setResources(ResourceBundle.getBundle("resources.customer", english));
         FXMLLoader appointmentLoader = new FXMLLoader(getClass().getResource("Appointment.fxml"));
-        
+        appointmentLoader.setResources(ResourceBundle.getBundle("resources.appointment", english));
         scenes.put("Main", (Parent)mainLoader.load());
         scenes.put("Login", (Parent)loginLoader.load());
         scenes.put("Customer", (Parent)customerLoader.load());

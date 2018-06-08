@@ -13,123 +13,163 @@
             GridPane.columnIndex="0"
             GridPane.rowIndex="0"
             fx:id="idLabel"
-            text="ID"
+            text="%id"
         />
         <TextField 
             GridPane.columnIndex="1"
             GridPane.rowIndex="0"
+            GridPane.columnSpan="3"
             fx:id="idText"
         />
         <Label
             GridPane.columnIndex="0"
             GridPane.rowIndex="1"
             fx:id="customerLabel"
-            text="Customer"
+            text="%customer"
         />
         <ChoiceBox 
             GridPane.columnIndex="1"
             GridPane.rowIndex="1"
+            GridPane.columnSpan="3"
             fx:id="customerSelect"
         />
         <Label
             GridPane.columnIndex="0"
             GridPane.rowIndex="2"
             fx:id="titleLabel"
-            text="Title"
+            text="%title"
         />
         <TextField 
             GridPane.columnIndex="1"
             GridPane.rowIndex="2"
+            GridPane.columnSpan="3"
             fx:id="titleText"
         />
         <Label
             GridPane.columnIndex="0"
             GridPane.rowIndex="3"
             fx:id="descriptionLabel"
-            text="Description"
+            text="%description"
         />
         <TextArea 
             GridPane.columnIndex="1"
             GridPane.rowIndex="3"
+            GridPane.columnSpan="3"
             fx:id="descriptionText"
         />
         <Label
             GridPane.columnIndex="0"
             GridPane.rowIndex="4"
             fx:id="locationLabel"
-            text="Location"
+            text="%location"
         />
         <TextField 
             GridPane.columnIndex="1"
             GridPane.rowIndex="4"
+            GridPane.columnSpan="3"
             fx:id="locationText"
         />
         <Label
             GridPane.columnIndex="0"
             GridPane.rowIndex="5"
             fx:id="contactLabel"
-            text="Contact"
+            text="%contact"
         />
         <TextField 
             GridPane.columnIndex="1"
             GridPane.rowIndex="5"
+            GridPane.columnSpan="3"
             fx:id="contactText"
         />
         <Label
             GridPane.columnIndex="0"
             GridPane.rowIndex="6"
             fx:id="typeLabel"
-            text="Type"
+            text="%type"
         />
         <TextField 
             GridPane.columnIndex="1"
             GridPane.rowIndex="6"
+            GridPane.columnSpan="3"
             fx:id="typeText"
         />
         <Label
             GridPane.columnIndex="0"
             GridPane.rowIndex="7"
             fx:id="urlLabel"
-            text="URL"
+            text="%url"
         />
         <TextField 
             GridPane.columnIndex="1"
             GridPane.rowIndex="7"
+            GridPane.columnSpan="3"
             fx:id="urlText"
         />
         <Label
             GridPane.columnIndex="0"
             GridPane.rowIndex="8"
-            fx:id="startLabel"
-            text="Start"
+            fx:id="dateLabel"
+            text="%date"
         />
         <DatePicker 
             GridPane.columnIndex="1"
             GridPane.rowIndex="8"
+            GridPane.columnSpan="3"
             fx:id="startDate"
         />
         <Label
             GridPane.columnIndex="0"
             GridPane.rowIndex="9"
-            fx:id="endLabel"
-            text="End"
+            fx:id="startLabel"
+            text="%start"
         />
-        <DatePicker 
+        <ChoiceBox 
             GridPane.columnIndex="1"
             GridPane.rowIndex="9"
-            fx:id="endDate"
+            fx:id="startDateHour"
+        />
+        <ChoiceBox 
+            GridPane.columnIndex="2"
+            GridPane.rowIndex="9"
+            fx:id="startDateMinute"
+        />
+        <ChoiceBox 
+            GridPane.columnIndex="3"
+            GridPane.rowIndex="9"
+            fx:id="startDateMeridian"
+        />
+        <Label
+            GridPane.columnIndex="0"
+            GridPane.rowIndex="10"
+            fx:id="endLabel"
+            text="%end"
+        />
+        <ChoiceBox 
+            GridPane.columnIndex="1"
+            GridPane.rowIndex="10"
+            fx:id="endDateHour"
+        />
+        <ChoiceBox 
+            GridPane.columnIndex="2"
+            GridPane.rowIndex="10"
+            fx:id="endDateMinute"
+        />
+        <ChoiceBox 
+            GridPane.columnIndex="3"
+            GridPane.rowIndex="10"
+            fx:id="endDateMeridian"
         />
         <Button
             GridPane.columnIndex="0"
-            GridPane.rowIndex="10"
-            text="Cancel"
+            GridPane.rowIndex="11"
+            text="%cancel"
             fx:id="cancelButton"
             onAction="#handleCancelAction"
         />
         <Button
             GridPane.columnIndex="1"
-            GridPane.rowIndex="10"
-            text="Save"
+            GridPane.rowIndex="11"
+            text="%save"
             fx:id="saveButton"
             onAction="#handleSaveAction"
         />

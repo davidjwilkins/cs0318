@@ -17,14 +17,16 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ChoiceBox;
-import javafx.util.StringConverter;
+
 /**
  * FXML Controller class
  *
  * @author david.wilkins
  */
 public class CustomerController extends SceneChangerController implements Initializable {
-
+    protected ResourceBundle rb;
+    protected Country selectedCountry;
+    protected City selectedCity;
     @FXML
     protected Label idLabel, nameLabel, addressLabel, address2Label, cityLabel,
             countryLabel, postalCodeLabel, phoneLabel;
@@ -37,23 +39,24 @@ public class CustomerController extends SceneChangerController implements Initia
     protected ChoiceBox countrySelect, citySelect;
     /**
      * Initializes the controller class.
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        this.rb = rb;
         // TODO
         idText.setDisable(true);
-        countrySelect.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                Country country = (Country) countrySelect.getItems().get((Integer) newValue);
-                citySelect.setValue(null);
-                citySelect.setItems(country.getCities());
-                citySelect.setDisable(false);
-                Context.getInstance().setCountry(country);
-            }
+        countrySelect.getSelectionModel().selectedIndexProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            Country country = (Country) countrySelect.getItems().get((Integer) newValue);
+            citySelect.setValue(null);
+            citySelect.setItems(country.getCities());
+            citySelect.setDisable(false);
+            this.selectedCountry = country;
         });
-        countrySelect.setConverter(new CountryStringConverter());
-        citySelect.setConverter(new CityStringConverter());
+        citySelect.getSelectionModel().selectedIndexProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            this.selectedCity = (City) citySelect.getItems().get((Integer) newValue);
+        });
     }    
     
     @FXML
@@ -76,10 +79,10 @@ public class CustomerController extends SceneChangerController implements Initia
             customer.setAddress(address);
             DB.connect().upsertCustomer(customer);
         } catch(SQLException e) {
-            errorMessage("Could not save customer", e);
+            errorMessage(rb.getString("couldNotSaveCustomer"), e);
         } catch (Exception e) {
             e.printStackTrace();
-            errorMessage("Unknown error", e);
+            errorMessage(rb.getString("unknownError"), e);
         }
         this.setScene("Main");
     }    
@@ -90,7 +93,7 @@ public class CustomerController extends SceneChangerController implements Initia
         if (c != null) {
             int id = c.getCustomerId();
             if (id == 0) {
-                idText.setText("NEW RECORD");
+                idText.setText(rb.getString("newRecord"));
             } else {
                 idText.setText(Integer.toString(id));
             }

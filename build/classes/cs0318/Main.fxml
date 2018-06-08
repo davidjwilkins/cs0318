@@ -13,14 +13,14 @@
         <Button 
             GridPane.columnIndex="0"
             GridPane.rowIndex="0"
-            text="Add Customer" 
+            text="%addCustomer" 
             onAction="#addCustomerAction" 
             fx:id="addCustomerButton"
         />
         <Button 
             GridPane.columnIndex="0"
             GridPane.rowIndex="1"
-            text="Add Appointment" 
+            text="%addAppointment" 
             onAction="#addAppointmentAction" 
             fx:id="addAppointmentButton"
         />
@@ -33,13 +33,13 @@
         />
         <Label
             fx:id="monthLabel"
-            text="Month"
+            text="%month"
             GridPane.columnIndex="3"
             GridPane.rowIndex="0"
         />
         <Label
             fx:id="yearLabel"
-            text="Year"
+            text="%year"
             GridPane.columnIndex="4"
             GridPane.rowIndex="0"
         />
@@ -53,14 +53,14 @@
             <ToggleGroup fx:id="viewType"/>  
         </fx:define>
         <ToggleButton
-            text="Month"
+            text="%month"
             fx:id="monthToggle"
             GridPane.columnIndex="6"
             GridPane.rowIndex="0"
             toggleGroup="$viewType"
         />
         <ToggleButton
-            text="Week"
+            text="%week"
             fx:id="weekToggle"
             GridPane.columnIndex="7"
             GridPane.rowIndex="0"

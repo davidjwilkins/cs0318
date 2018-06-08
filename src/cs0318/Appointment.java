@@ -5,6 +5,9 @@
  */
 package cs0318;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
@@ -206,5 +209,12 @@ public class Appointment extends Entity {
      */
     public void setEnd(Date end) {
         this.end = end;
+    }
+    
+        @Override
+    public String toString() {
+        LocalDate start = this.getStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate end = this.getEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return start.format(DateTimeFormatter.ISO_LOCAL_TIME) + " - " + end.format(DateTimeFormatter.ISO_LOCAL_TIME);
     }
 }

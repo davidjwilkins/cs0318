@@ -33,7 +33,7 @@ public class LoginController extends SceneChangerController implements Initializ
     private Button loginButton;
     
     private DB db;
-    
+    private ResourceBundle rb;
     @FXML
     private void handleLoginAction(ActionEvent event) {
         User user = new User();
@@ -41,14 +41,14 @@ public class LoginController extends SceneChangerController implements Initializ
         user.setPassword(passwordText.getText());
         loginButton.setDisable(true);
         String originalText = loginButton.getText();
-        loginButton.setText("Logging in...");
+        loginButton.setText(rb.getString("loggingIn"));
         try {
             db.login(user);
             this.setScene("Main");
         } catch (SQLException e) {
-            errorMessage("Could not connect to database", e);
+            errorMessage(rb.getString("couldNotConnect"), e);
         } catch (Exception e) {
-            errorMessage("Invalid Login", e);
+            errorMessage(rb.getString("invalidLogin"), e);
         }
         loginButton.setText(originalText);
         loginButton.setDisable(false);
@@ -57,10 +57,10 @@ public class LoginController extends SceneChangerController implements Initializ
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         this.db = DB.connect();
+        this.rb = rb;
     }    
     
     @Override
     protected void refresh() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

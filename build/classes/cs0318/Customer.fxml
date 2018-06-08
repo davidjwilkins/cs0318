@@ -13,7 +13,7 @@
             GridPane.columnIndex="0"
             GridPane.rowIndex="0"
             fx:id="idLabel"
-            text="ID"
+            text="%id"
         />
         <TextField 
             GridPane.columnIndex="1"
@@ -24,7 +24,7 @@
             GridPane.columnIndex="0"
             GridPane.rowIndex="1"
             fx:id="nameLabel"
-            text="Name"
+            text="%name"
         />
         <TextField 
             GridPane.columnIndex="1"
@@ -35,7 +35,7 @@
             GridPane.columnIndex="0"
             GridPane.rowIndex="2"
             fx:id="addressLabel"
-            text="Address"
+            text="%address"
         />
         <TextField 
             GridPane.columnIndex="1"
@@ -46,7 +46,7 @@
             GridPane.columnIndex="0"
             GridPane.rowIndex="3"
             fx:id="address2Label"
-            text="Address 2"
+            text="%address2"
         />
         <TextField 
             GridPane.columnIndex="1"
@@ -58,7 +58,7 @@
             GridPane.columnIndex="0"
             GridPane.rowIndex="4"
             fx:id="countryLabel"
-            text="Country"
+            text="%country"
         />
         <ChoiceBox 
             GridPane.columnIndex="1"
@@ -69,7 +69,7 @@
             GridPane.columnIndex="0"
             GridPane.rowIndex="5"
             fx:id="cityLabel"
-            text="City"
+            text="%city"
         />
         <ChoiceBox 
             GridPane.columnIndex="1"
@@ -80,7 +80,7 @@
             GridPane.columnIndex="0"
             GridPane.rowIndex="6"
             fx:id="postalCodeLabel"
-            text="Postal Code"
+            text="%postalCode"
         />
         <TextField 
             GridPane.columnIndex="1"
@@ -91,7 +91,7 @@
             GridPane.columnIndex="0"
             GridPane.rowIndex="7"
             fx:id="phoneLabel"
-            text="Phone"
+            text="%phone"
         />
         <TextField 
             GridPane.columnIndex="1"
@@ -101,14 +101,14 @@
         <Button
             GridPane.columnIndex="0"
             GridPane.rowIndex="8"
-            text="Cancel"
+            text="%cancel"
             fx:id="cancelButton"
             onAction="#handleCancelAction"
         />
         <Button
             GridPane.columnIndex="1"
             GridPane.rowIndex="8"
-            text="Save"
+            text="%save"
             fx:id="saveButton"
             onAction="#handleSaveAction"
         />

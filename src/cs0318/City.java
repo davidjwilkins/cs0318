@@ -120,4 +120,10 @@ public class City extends Entity {
     public void setCountryId(int countryId) {
         this.countryId = countryId;
     }
+    
+    @Override
+    public String toString() {
+        return this.getCity();
+    }
+
 }

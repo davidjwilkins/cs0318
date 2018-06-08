@@ -21,11 +21,11 @@ public class Context {
     protected ArrayList<Country> countries;
     protected ObservableList<Customer> customers;
     protected HashMap<Integer, Country> countryIds;
-    protected Country country;
     
     private Context() {
         if (instance == null) this.instance = this;       
         this.countries = new ArrayList<>();
+        this.customers = FXCollections.observableArrayList();
     }
     
     public static Context getInstance()
@@ -34,14 +34,6 @@ public class Context {
             instance = new Context();
  
         return instance;
-    }
-    
-    public void setCountry(Country country) {
-        this.country = country;
-    }
-    
-    public Country getCountry() {
-        return this.country;
     }
     
     public void setCountries(ArrayList<Country> countries) {

@@ -11,7 +11,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -30,7 +29,7 @@ import javafx.util.Callback;
  * @author david.wilkins
  */
 public class MainController extends SceneChangerController implements Initializable {
-    
+    protected ResourceBundle rb;
     @FXML
     private Button addAppointmentButton, addCustomerButton;
     
@@ -42,7 +41,7 @@ public class MainController extends SceneChangerController implements Initializa
     private ToggleGroup viewType;
     
     private Date calendarDate;
-    private String view = "Month";
+    private String view = "";
 
     @FXML
     private void addAppointmentAction(ActionEvent event) {
@@ -60,7 +59,7 @@ public class MainController extends SceneChangerController implements Initializa
     private void incrementMonth(ActionEvent event) {
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(calendarDate);
-        if (view.equals("Month")) {
+        if (view.equals(rb.getString("couldNotSaveCustomer"))) {
             calendar.add(Calendar.MONTH, 1);
         } else {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -73,7 +72,7 @@ public class MainController extends SceneChangerController implements Initializa
     private void decrementMonth(ActionEvent event) {
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(calendarDate);
-        if (view.equals("Month")) {
+        if (view.equals(rb.getString("month"))) {
             calendar.add(Calendar.MONTH, -1);
         } else {
             calendar.add(Calendar.DAY_OF_MONTH, -1);
@@ -83,6 +82,7 @@ public class MainController extends SceneChangerController implements Initializa
     }
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        this.rb = rb;
         this.calendarDate = new Date();
         viewType.selectedToggleProperty().addListener((ObservableValue<? extends Toggle> ov, Toggle old_toggle, Toggle new_toggle) -> {
             if (viewType.getSelectedToggle() != null) {
@@ -123,7 +123,7 @@ public class MainController extends SceneChangerController implements Initializa
         User user = Context.getInstance().getUser();
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(date);
-        if (view.equals("Month")) {
+        if (view.equals(rb.getString("month"))) {
             calendar.set(Calendar.DAY_OF_MONTH, 1);
         } else {
             calendar.set(Calendar.DAY_OF_WEEK, 7);
@@ -140,7 +140,7 @@ public class MainController extends SceneChangerController implements Initializa
         }
         Calendar c = (Calendar) calendar.clone();
         c.set(Calendar.DAY_OF_WEEK, 1);
-        if (view.equals("Month")) {
+        if (view.equals(rb.getString("month"))) {
             for (int i = 0; i < 7; i++) {
                 Label dayLabel = new Label();
                 dayLabel.setText(dayName.format(c.getTime()));

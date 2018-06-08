@@ -183,21 +183,9 @@ public class DB {
             c.setActive(customers.getBoolean("active"));
             c.setAddressId(customers.getInt("addressId"));
             c.setAddress(addressMap.get(c.getAddressId()));
-            c.setCustomerName(customers.getString("customer"));
+            c.setCustomerName(customers.getString("customerName"));
             customerMap.put(customerId, c);
-        }
-        
-        HashMap<Integer, Appointment> customerMap = new HashMap<>();
-        ResultSet customers = customersQuery.executeQuery();
-        while(customers.next()) {
-            Customer c = new Customer();
-            Integer customerId = customers.getInt("customerId");
-            c.setCustomerId(customerId);
-            c.setActive(customers.getBoolean("active"));
-            c.setAddressId(customers.getInt("addressId"));
-            c.setAddress(addressMap.get(c.getAddressId()));
-            c.setCustomerName(customers.getString("customer"));
-            customerMap.put(customerId, c);
+            context.addCustomer(c);
         }
     }
     //Closes connections

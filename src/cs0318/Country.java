@@ -93,4 +93,9 @@ public class Country extends Entity {
     public void setCountry(String country) {
         this.country = country;
     }
+    
+        @Override
+    public String toString() {
+        return this.getCountry();
+    }
 }
