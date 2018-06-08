@@ -25,25 +25,23 @@ public class CS0318 extends Application {
     protected HashMap<String, Parent> scenes;
     protected HashMap<String, SceneChangerController> controllers;
 
-    @Override
-    public void start(Stage stage) throws Exception {
-        Locale english = new Locale("en", "EN");
+    protected void initializeForLanguage(String language) throws Exception {
+        Locale locale = new Locale(language, language.toUpperCase());
         SceneChangerController appointmentController, customerController, loginController, mainController;
         scenes = new HashMap<>();
         controllers = new HashMap<>();
         FXMLLoader mainLoader = new FXMLLoader(getClass().getResource("Main.fxml"));
-        mainLoader.setResources(ResourceBundle.getBundle("resources.main", english));
+        mainLoader.setResources(ResourceBundle.getBundle("resources.main", locale));
         FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("Login.fxml"));
-        loginLoader.setResources(ResourceBundle.getBundle("resources.login", english));
+        loginLoader.setResources(ResourceBundle.getBundle("resources.login", locale));
         FXMLLoader customerLoader = new FXMLLoader(getClass().getResource("Customer.fxml"));
-        customerLoader.setResources(ResourceBundle.getBundle("resources.customer", english));
+        customerLoader.setResources(ResourceBundle.getBundle("resources.customer", locale));
         FXMLLoader appointmentLoader = new FXMLLoader(getClass().getResource("Appointment.fxml"));
-        appointmentLoader.setResources(ResourceBundle.getBundle("resources.appointment", english));
+        appointmentLoader.setResources(ResourceBundle.getBundle("resources.appointment", locale));
         scenes.put("Main", (Parent)mainLoader.load());
         scenes.put("Login", (Parent)loginLoader.load());
         scenes.put("Customer", (Parent)customerLoader.load());
         scenes.put("Appointment", (Parent)appointmentLoader.load());
-        
         mainController = ((MainController)mainLoader.getController());
         loginController = ((LoginController)loginLoader.getController());
         customerController = ((CustomerController)customerLoader.getController());
@@ -51,6 +49,14 @@ public class CS0318 extends Application {
         
         mainController.setSceneChanger(s -> this.setScene(s));
         loginController.setSceneChanger(s -> this.setScene(s));
+        ((LoginController) loginController).setLangChanger(lang -> {
+            try {
+                ResourceBundle.clearCache();
+                initializeForLanguage(lang);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        });
         customerController.setSceneChanger(s -> this.setScene(s));
         appointmentController.setSceneChanger(s -> this.setScene(s));
         
@@ -60,9 +66,15 @@ public class CS0318 extends Application {
         controllers.put("Appointment", appointmentController);
         
         scene = new Scene(scenes.get("Login"));
+        System.out.println("Setting scene...");
         stage.setScene(scene);
         stage.show();
+    }
+    
+    @Override
+    public void start(Stage stage) throws Exception {
         this.stage = stage;
+        initializeForLanguage("en");
     }
 
     protected void setScene(String name) {

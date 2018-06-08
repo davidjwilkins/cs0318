@@ -30,6 +30,23 @@
             GridPane.rowIndex="1"
             fx:id="passwordText"
         />
+        <fx:define>
+            <ToggleGroup fx:id="lang"/>
+        </fx:define>
+        <RadioButton 
+            text="English" 
+            fx:id="englishButton" 
+            toggleGroup="$lang"
+            GridPane.columnIndex="0"
+            GridPane.rowIndex="3"
+        />
+        <RadioButton 
+            text="русский" 
+            fx:id="russianButton"
+            toggleGroup="$lang"
+            GridPane.columnIndex="1"
+            GridPane.rowIndex="3"
+        />
         <Button
             text="%login"
             GridPane.columnIndex="0"

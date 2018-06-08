@@ -157,7 +157,6 @@ public class MainController extends SceneChangerController implements Initializa
                 ListView<Appointment> list = new ListView<>();
                 list.setCellFactory(cellRenderer);
                 list.setItems(user.getAppointments(calendar.getTime()));
-
                 pane.add(list, 0, 1);
                 calendarGrid.add(pane, col, row + 1);
                 calendar.add(Calendar.DAY_OF_MONTH, 1);

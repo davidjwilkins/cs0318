@@ -10,21 +10,36 @@
 <GridPane hgap="10" vgap="10" id="GridPane" prefHeight="400" prefWidth="600" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cs0318.MainController">
     <padding><Insets top="25" right="25" bottom="10" left="25"/></padding>
     <children>
-        <Button 
+        <GridPane 
             GridPane.columnIndex="0"
             GridPane.rowIndex="0"
-            text="%addCustomer" 
-            onAction="#addCustomerAction" 
-            fx:id="addCustomerButton"
-        />
-        <Button 
-            GridPane.columnIndex="0"
-            GridPane.rowIndex="1"
-            text="%addAppointment" 
-            onAction="#addAppointmentAction" 
-            fx:id="addAppointmentButton"
-        />
-        
+            GridPane.rowSpan="2"
+        >
+            <VBox spacing="10">
+            <Button 
+                GridPane.columnIndex="0"
+                GridPane.rowIndex="0"
+                text="%addCustomer" 
+                onAction="#addCustomerAction" 
+                fx:id="addCustomerButton"
+                maxWidth="1000"
+            />
+            <Button 
+                GridPane.columnIndex="0"
+                GridPane.rowIndex="2"
+                text="Edit Appointment" 
+                fx:id="editAppointmentButton"
+                maxWidth="1000"
+            />
+            <Button 
+                GridPane.columnIndex="0"
+                GridPane.rowIndex="3"
+                text="Delete Appointment" 
+                fx:id="deleteAppointmentButton"
+                maxWidth="1000"
+            />
+            </VBox>
+        </GridPane>
         <Button
             text="←"
             GridPane.columnIndex="2"
