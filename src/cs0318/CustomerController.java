@@ -37,6 +37,8 @@ public class CustomerController extends SceneChangerController implements Initia
     
     @FXML
     protected ChoiceBox countrySelect, citySelect;
+    
+    @FXML Label title;
     /**
      * Initializes the controller class.
      * @param url
@@ -55,8 +57,11 @@ public class CustomerController extends SceneChangerController implements Initia
             this.selectedCountry = country;
         });
         citySelect.getSelectionModel().selectedIndexProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-            this.selectedCity = (City) citySelect.getItems().get((Integer) newValue);
+            if (!newValue.equals(-1)) {
+                this.selectedCity = (City) citySelect.getItems().get((Integer) newValue);
+            }
         });
+        title.setText(rb.getString("create") + " " + rb.getString("customer"));
     }    
     
     @FXML
@@ -94,8 +99,10 @@ public class CustomerController extends SceneChangerController implements Initia
             int id = c.getCustomerId();
             if (id == 0) {
                 idText.setText(rb.getString("newRecord"));
+                title.setText(rb.getString("create") + " " + rb.getString("customer"));
             } else {
                 idText.setText(Integer.toString(id));
+                title.setText(rb.getString("edit") + " " + rb.getString("customer"));
             }
             nameText.setText(c.getCustomerName());
             addressText.setText(c.getAddress().getAddress());
@@ -104,9 +111,9 @@ public class CustomerController extends SceneChangerController implements Initia
             postalCodeText.setText(c.getAddress().getPostalCode());
             phoneText.setText(c.getAddress().getPhone());
             countrySelect.setItems(FXCollections.observableArrayList(Context.getInstance().getCountries()));
+            countrySelect.setValue(c.getAddress().getCity().getCountry());
             citySelect.setItems(c.getAddress().getCity().getCountry().getCities());
             citySelect.setValue(c.getAddress().getCity());
-            countrySelect.setValue(c.getAddress().getCity().getCountry());
             if (c.getAddress().getCity().getCountry().getCountryId() == 0) {
                 citySelect.setDisable(true);
             } else {

@@ -5,6 +5,7 @@
  */
 package cs0318;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
@@ -21,7 +22,7 @@ public class Country extends Entity {
     protected HashMap<Integer, City> cityIds;
     
     public Country() {
-        this.cities = FXCollections.observableArrayList();
+        this.cities = FXCollections.observableArrayList(new ArrayList<>());
         this.cityIds = new HashMap<>();
         cities.addListener((ListChangeListener<City>) c -> {
             while (c.next()) {

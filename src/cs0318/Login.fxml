@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
-<GridPane hgap="10" vgap="10" id="LoginPane" prefHeight="200" prefWidth="320" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cs0318.LoginController">
+<GridPane hgap="10" vgap="10" id="LoginPane" prefHeight="180" prefWidth="300" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cs0318.LoginController">
     <padding><Insets top="25" right="25" bottom="10" left="25"/></padding>
     <children>
         <Label

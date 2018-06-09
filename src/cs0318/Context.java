@@ -20,6 +20,7 @@ public class Context {
     protected Customer customer;
     protected ArrayList<Country> countries;
     protected ObservableList<Customer> customers;
+    protected ObservableList<Appointment> appointments;
     protected HashMap<Integer, Country> countryIds;
     
     private Context() {
@@ -49,6 +50,7 @@ public class Context {
     }
     
     public void addCustomer(Customer customer) {
+        System.out.println("Adding Customer " + customer.getCreatedBy());
         this.customers.add(customer);
     }
     
@@ -83,4 +85,5 @@ public class Context {
     public User getUser() {
         return user;
     }
+    
 }

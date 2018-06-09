@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.cell.*?>
+<GridPane id="ListCustomers" hgap="10" vgap="10" prefHeight="400.0" prefWidth="270" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cs0318.ListCustomersController">
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding> 
+    <Label
+        text="%customers"                
+        GridPane.columnIndex="0"
+        GridPane.rowIndex="0">
+    </Label>
+    <TableView
+        GridPane.columnIndex="0"
+        GridPane.rowIndex="1"
+        GridPane.columnSpan="3"
+        fx:id="customersList"
+    >
+        <columns>
+          <TableColumn text="%id">
+            <cellValueFactory>
+              <PropertyValueFactory property="customerId" />
+            </cellValueFactory>
+          </TableColumn>
+          <TableColumn text="%name">
+              <cellValueFactory>
+                <PropertyValueFactory property="customerName" />
+              </cellValueFactory>
+          </TableColumn>
+     </columns>    
+    </TableView>
+    <HBox
+        spacing="10"
+        GridPane.columnIndex="0"
+        GridPane.rowIndex="2"
+    >
+        <Button
+            fx:id="editCustomerButton"
+            text="%edit"
+            
+            onAction="#handleEditAction"
+        />
+        <Button
+            fx:id="deleteCustomerButton"
+            text="%delete"
+            onAction="#handleDeleteAction"
+        />
+        <Button
+            fx:id="cancelButton"
+            text="%cancel"
+            onAction="#handleCancelAction"
+        />
+    </HBox>
+    
+    
+</GridPane>

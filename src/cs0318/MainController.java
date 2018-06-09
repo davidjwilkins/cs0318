@@ -6,7 +6,12 @@
 package cs0318;
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -31,7 +36,8 @@ import javafx.util.Callback;
 public class MainController extends SceneChangerController implements Initializable {
     protected ResourceBundle rb;
     @FXML
-    private Button addAppointmentButton, addCustomerButton;
+    private Button addAppointmentButton, addCustomerButton, listCustomersButton,
+            editAppointmentButton, deleteAppointmentButton;
     
     @FXML private GridPane calendarGrid;
     
@@ -40,9 +46,32 @@ public class MainController extends SceneChangerController implements Initializa
     @FXML
     private ToggleGroup viewType;
     
+    @FXML
+    private ToggleButton monthToggle, weekToggle;
+    
     private Date calendarDate;
     private String view = "";
-
+    private Appointment selectedAppointment;
+    
+    @FXML
+    private void editAppointmentAction(ActionEvent event) {
+        Context.getInstance().setAppointment(selectedAppointment);
+        this.setScene("Appointment");
+    }
+    
+    @FXML
+    private void deleteAppointmentAction(ActionEvent event) {
+        try {
+            DB.connect().deleteAppointment(selectedAppointment);
+            Context.getInstance().getUser().getAppointments().remove(selectedAppointment);
+        } catch (SQLException e) {
+            errorMessage(rb.getString("couldNotDeleteAppointment"), e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            errorMessage(rb.getString("unknownError"), e);
+        }
+    }
+    
     @FXML
     private void addAppointmentAction(ActionEvent event) {
         Context.getInstance().setAppointment(new Appointment());
@@ -56,13 +85,18 @@ public class MainController extends SceneChangerController implements Initializa
     }
     
     @FXML
+    private void listCustomersAction(ActionEvent event) {
+        this.setScene("List Customers");
+    }
+    
+    @FXML
     private void incrementMonth(ActionEvent event) {
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(calendarDate);
-        if (view.equals(rb.getString("couldNotSaveCustomer"))) {
+        if (view.equals(rb.getString("month"))) {
             calendar.add(Calendar.MONTH, 1);
         } else {
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            calendar.add(Calendar.DAY_OF_MONTH, 7);
         }
         calendarDate = calendar.getTime();
         drawCalendar();
@@ -75,7 +109,7 @@ public class MainController extends SceneChangerController implements Initializa
         if (view.equals(rb.getString("month"))) {
             calendar.add(Calendar.MONTH, -1);
         } else {
-            calendar.add(Calendar.DAY_OF_MONTH, -1);
+            calendar.add(Calendar.DAY_OF_MONTH, -7);
         }
         calendarDate = calendar.getTime();
         drawCalendar();
@@ -94,8 +128,6 @@ public class MainController extends SceneChangerController implements Initializa
     }
     
     protected Callback<ListView<Appointment>, ListCell<Appointment>> cellRenderer() {
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:MM");
-        
         return (ListView<Appointment> param) -> {
             ListCell<Appointment> cell = new ListCell<Appointment>() {
                 
@@ -103,9 +135,7 @@ public class MainController extends SceneChangerController implements Initializa
                 protected void updateItem(Appointment item, boolean empty) {
                     super.updateItem(item, empty);
                     if (item != null) {
-                        String start = formatter.format(item.getStart());
-                        String end = formatter.format(item.getEnd());
-                        setText("(" + start + " - " + end + ") " + item.getTitle());
+                        setText(item.toString());
                     } else {
                         setText("");
                     }
@@ -132,7 +162,7 @@ public class MainController extends SceneChangerController implements Initializa
         SimpleDateFormat dayOfWeek = new SimpleDateFormat("u");
         SimpleDateFormat dayOfMonth = new SimpleDateFormat("dd");
         SimpleDateFormat dayName = new SimpleDateFormat("E");
-        SimpleDateFormat weekDayFormatter = new SimpleDateFormat("E dd");
+        SimpleDateFormat weekDayFormatter = new SimpleDateFormat("E dd MMM");
         int dayNumber = Integer.parseInt(dayOfWeek.format(calendar.getTime()));
         int numberOfBlanks = dayNumber % 7;
         if (calendarGrid.getChildren().size() > 0) {
@@ -156,7 +186,16 @@ public class MainController extends SceneChangerController implements Initializa
                 pane.add(dayLabel, 0, 0);
                 ListView<Appointment> list = new ListView<>();
                 list.setCellFactory(cellRenderer);
-                list.setItems(user.getAppointments(calendar.getTime()));
+                Date d = calendar.getTime();
+                Instant instant = d.toInstant();
+                LocalDate localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+                list.setItems(user.getAppointments(localDate));
+                list.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {;
+                    boolean disabled = newValue == null;
+                    editAppointmentButton.setDisable(disabled);
+                    deleteAppointmentButton.setDisable(disabled);
+                    this.selectedAppointment = (Appointment) newValue;
+                });
                 pane.add(list, 0, 1);
                 calendarGrid.add(pane, col, row + 1);
                 calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -167,7 +206,16 @@ public class MainController extends SceneChangerController implements Initializa
                 dayLabel.setText(weekDayFormatter.format(c.getTime()));
                 ListView<Appointment> list = new ListView<>();
                 list.setCellFactory(cellRenderer);
-                list.setItems(user.getAppointments(c.getTime()));
+                Date d = c.getTime();
+                Instant instant = d.toInstant();
+                LocalDate localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+                list.setItems(user.getAppointments(localDate));
+                list.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {;
+                    boolean disabled = newValue == null;
+                    editAppointmentButton.setDisable(disabled);
+                    deleteAppointmentButton.setDisable(disabled);
+                    this.selectedAppointment = (Appointment) newValue;
+                });
                 c.add(Calendar.DAY_OF_MONTH, 1);
                 calendarGrid.add(dayLabel, i, 0);
                 calendarGrid.add(list, i, 1);
@@ -177,6 +225,11 @@ public class MainController extends SceneChangerController implements Initializa
     
     @Override
     protected void refresh() {
+        this.view = rb.getString("month");
+        this.monthToggle.setSelected(true);
+        this.weekToggle.setSelected(false);
         drawCalendar();
+        editAppointmentButton.setDisable(true);
+        deleteAppointmentButton.setDisable(true);
     }
 }

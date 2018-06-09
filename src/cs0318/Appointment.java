@@ -5,10 +5,8 @@
  */
 package cs0318;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 /**
  *
@@ -18,14 +16,14 @@ public class Appointment extends Entity {
     private int appointmentId;
     private int customerId;
     private int userId;
-    private String title;
-    private String description;
-    private String location;
-    private String contact;
-    private String type;
-    private String url;
-    private Date start;
-    private Date end;
+    private String title = "";
+    private String description = "";
+    private String location = "";
+    private String contact = "";
+    private String type = "";
+    private String url = "";
+    private LocalDateTime start;
+    private LocalDateTime end;
     private User user;
     private Customer customer;
     
@@ -186,35 +184,33 @@ public class Appointment extends Entity {
     /**
      * @return the start
      */
-    public Date getStart() {
+    public LocalDateTime getStart() {
         return start;
     }
 
     /**
      * @param start the start to set
      */
-    public void setStart(Date start) {
+    public void setStart(LocalDateTime start) {
         this.start = start;
     }
 
     /**
      * @return the end
      */
-    public Date getEnd() {
+    public LocalDateTime getEnd() {
         return end;
     }
 
     /**
      * @param end the end to set
      */
-    public void setEnd(Date end) {
+    public void setEnd(LocalDateTime end) {
         this.end = end;
     }
     
         @Override
     public String toString() {
-        LocalDate start = this.getStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate end = this.getEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        return start.format(DateTimeFormatter.ISO_LOCAL_TIME) + " - " + end.format(DateTimeFormatter.ISO_LOCAL_TIME);
+        return start.format(DateTimeFormatter.ofPattern("h:mm a")) + "-" + end.format(DateTimeFormatter.ofPattern("h:mm a")) + " " + title;
     }
 }

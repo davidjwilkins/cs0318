@@ -36,15 +36,23 @@ public class DB {
             statements.put("cities", connection.prepareStatement("SELECT * FROM city"));
             statements.put("customers", connection.prepareStatement("SELECT * FROM customer"));
             statements.put("addresses", connection.prepareStatement("SELECT * FROM address"));
-            statements.put("appointments", connection.prepareStatement("SELECT * FROM appointments"));
+            statements.put("appointments", connection.prepareStatement("SELECT * FROM appointment"));
             statements.put("insertCustomer", connection.prepareStatement("INSERT INTO customer(customerName, addressId, active, createDate, createdBy, lastUpdateBy) "
                     + "VALUES(?, ?, ?, NOW(), ?, '')", Statement.RETURN_GENERATED_KEYS));
-            statements.put("updateCustomer", connection.prepareStatement("UPDATE customers SET customerName = ?, addressId = ?, active = ?, lastUpdate = NOW(), lastUpdatedBy = ? "
-                    + "WHERE id = ?"));
+            statements.put("updateCustomer", connection.prepareStatement("UPDATE customer SET customerName = ?, addressId = ?, active = ?, lastUpdate = NOW(), lastUpdateBy = ? "
+                    + "WHERE customerId = ?"));
             statements.put("insertAddress", connection.prepareStatement("INSERT INTO address(address, address2, cityId, postalCode, phone, createDate, createdBy, lastUpdateBy) "
                     + "VALUES(?, ?, ?, ?, ?, NOW(), ?, '')", Statement.RETURN_GENERATED_KEYS)); 
-            statements.put("updateAddress", connection.prepareStatement("UPDATE address SET address = ?, address2 = ?, postalCode = ?, phone = ?, "
-                    + "postalCode = ?, lastUpdate = NOW(), lastUpdateBy = ? WHERE id = ?"));
+            statements.put("updateAddress", connection.prepareStatement("UPDATE address SET address = ?, address2 = ?, cityId = ?, postalCode = ?, phone = ?, "
+                    + "lastUpdate = NOW(), lastUpdateBy = ? WHERE addressId = ?"));
+            statements.put("insertAppointment", connection.prepareStatement("INSERT INTO appointment(customerId, title, description, location, contact, url, start, end, createDate,"
+                    + " createdBy, lastUpdateBy) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, '')", Statement.RETURN_GENERATED_KEYS));
+            statements.put("updateAppointment", connection.prepareStatement("UPDATE appointment SET customerId = ?, title = ?, description = ?, location = ?, contact = ?, url = ?, "
+                    + "start = ?, end = ?, lastUpdate = NOW(), lastUpdateBy = ? WHERE appointmentId = ?"));
+            statements.put("deleteAppointment", connection.prepareStatement("DELETE FROM appointment WHERE appointmentId = ?"));
+            statements.put("deleteCustomer", connection.prepareStatement("DELETE FROM customer WHERE customerId = ?"));
+            statements.put("deleteCustomerAppointments", connection.prepareStatement("DELETE FROM appointment WHERE customerId = ?"));
+            statements.put("deleteAddress", connection.prepareStatement("DELETE FROM address WHERE addressId = ?"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -54,7 +62,6 @@ public class DB {
     public static DB connect(){
         if (instance == null) {
             instance = new DB();
-            System.out.println(instance);
         }
         return instance;
     }
@@ -71,7 +78,12 @@ public class DB {
         if(exists.next()){
             user.setUserId(exists.getInt("userId"));
             Context.getInstance().setUser(user);
-            populate();
+            try {
+                populate();
+            } catch(Exception e) {
+                e.printStackTrace();
+                throw new Exception("Error populating from database: " + e.getMessage());
+            }
         } else {
             throw new Exception("This username/password combination does not exist");
         }
@@ -93,7 +105,6 @@ public class DB {
         s.executeUpdate();
         if (customer.getCustomerId() == 0) {
             ResultSet exists = s.getGeneratedKeys();
-            System.out.println(exists);
             if(exists.next()){
                 customer.setAddressId(exists.getInt(1));
             } else {
@@ -120,14 +131,71 @@ public class DB {
         s.executeUpdate();
         if (address.getAddressId() == 0) {
             ResultSet exists = s.getGeneratedKeys();
-            System.out.println(exists);
             if(exists.next()){
                 address.setAddressId(exists.getInt(1));
             } else {
-                System.out.println(exists);
                 throw new Exception("Could not create/update address");
             }
         }
+    }
+    
+    public void upsertAppointment(Appointment appointment) throws SQLException, Exception {
+        PreparedStatement s;
+        if (appointment.getAppointmentId() == 0) {
+            s = (PreparedStatement) statements.get("insertAppointment");
+        } else {
+            s = (PreparedStatement) statements.get("updateAppointment");
+            s.setInt(10, appointment.getAppointmentId());
+        }
+        //(customerId, title, description, location, contact, url, start, end, createDate, createdBy)
+        s.setInt(1, appointment.getCustomerId());
+        s.setString(2, appointment.getTitle());
+        s.setString(3, appointment.getDescription());
+        s.setString(4, appointment.getLocation());
+        s.setString(5, appointment.getContact());
+        s.setString(6, appointment.getUrl());
+        s.setTimestamp(7, java.sql.Timestamp.valueOf(appointment.getStart()));
+        s.setTimestamp(8, java.sql.Timestamp.valueOf(appointment.getEnd()));
+        s.setString(9, Context.getInstance().getUser().getUserName());
+        s.executeUpdate();
+        if (appointment.getAppointmentId() == 0) {
+            ResultSet exists = s.getGeneratedKeys();
+            if(exists.next()){
+                appointment.setAppointmentId(exists.getInt(1));
+            } else {
+                throw new Exception("Could not create/update appointment");
+            }
+        }
+    }
+    
+    public void deleteCustomer(Customer c) throws SQLException, Exception {
+        try {
+            connection.setAutoCommit(false);
+            PreparedStatement s = statements.get("deleteAddress");
+            s.setInt(1, c.getAddressId());
+            s.executeUpdate();
+            s = statements.get("deleteCustomer");
+            s.setInt(1, c.getCustomerId());
+            s.executeUpdate();
+            s = statements.get("deleteCustomerAppointments");
+            s.setInt(1, c.getCustomerId());
+            s.executeUpdate();
+            connection.commit();
+        } catch (SQLException e ) {
+            if (connection != null) {
+                System.err.print("Transaction is being rolled back");
+                connection.rollback(); 
+            }
+            throw e;
+        } finally {
+            connection.setAutoCommit(true);
+        }
+    }
+    
+    public void deleteAppointment(Appointment a) throws SQLException, Exception {                
+        PreparedStatement s = statements.get("deleteAppointment");
+        s.setInt(1, a.getAppointmentId());
+        s.executeUpdate();
     }
     
     protected void populate() throws SQLException, Exception {
@@ -186,6 +254,22 @@ public class DB {
             c.setCustomerName(customers.getString("customerName"));
             customerMap.put(customerId, c);
             context.addCustomer(c);
+        }
+        PreparedStatement appointmentsQuery = (PreparedStatement) statements.get("appointments");
+        ResultSet appointments = appointmentsQuery.executeQuery();
+        while(appointments.next()) {
+            Appointment a = new Appointment();
+            a.setAppointmentId(appointments.getInt("appointmentId"));
+            a.setContact(appointments.getString("contact"));
+            a.setCreateDate(appointments.getDate("createDate"));
+            a.setCreatedBy(appointments.getString("createdBy"));
+            a.setCustomer(customerMap.get(appointments.getInt("customerId")));
+            a.setDescription(appointments.getString("description"));
+            a.setEnd(appointments.getTimestamp("end").toLocalDateTime());
+            a.setStart(appointments.getTimestamp("start").toLocalDateTime());
+            a.setTitle(appointments.getString("title"));
+            a.setUrl(appointments.getString("url"));
+            a.setUser(context.getUser());
         }
     }
     //Closes connections

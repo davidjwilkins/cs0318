@@ -6,6 +6,7 @@
 package cs0318;
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -61,11 +62,14 @@ public class AppointmentController extends SceneChangerController implements Ini
     public void initialize(URL url, ResourceBundle rb) {
         this.rb = rb;
         customerSelect.getSelectionModel().selectedIndexProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            if (newValue.equals(-1)) {
+                return;
+            }
             this.selectedCustomer = (Customer) customerSelect.getItems().get((Integer) newValue);
         });
         idText.setDisable(true);
         ObservableList<String> hours = FXCollections.observableArrayList("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
-        ObservableList<String> minutes = FXCollections.observableArrayList("5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60");
+        ObservableList<String> minutes = FXCollections.observableArrayList("05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60");
         ObservableList<String> meridians = FXCollections.observableArrayList(rb.getString("am"), rb.getString("pm"));
         startDateHour.setItems(hours);
         endDateHour.setItems(hours);
@@ -90,26 +94,24 @@ public class AppointmentController extends SceneChangerController implements Ini
         app.setType(typeText.getText());
         app.setUrl(urlText.getText());
         app.setDescription(descriptionText.getText());
-        Date appointmentStarts = java.sql.Date.valueOf(startDate.getValue());
-        Date appointmentEnds = (Date) appointmentStarts.clone();
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTimeZone(TimeZone.getDefault());
-        calendar.setTime(appointmentStarts);
+        LocalDate appointmentStarts = startDate.getValue();
+        LocalDate appointmentEnds = appointmentStarts;
+
         boolean isPM = startDateMeridian.getValue().equals(rb.getString("pm"));
         int hour = Integer.parseInt((String) startDateHour.getValue());
         int minute = Integer.parseInt((String) startDateMinute.getValue());
         if (hour == 12 && !isPM) {
             hour = 0;
-        }
-        if (isPM) {
+        } else if (isPM) {
             hour += 12;
         }
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        app.setStart(calendar.getTime());
-        calendar = new GregorianCalendar();
-        calendar.setTime(appointmentEnds);
-        calendar.setTimeZone(TimeZone.getDefault());
+        if (hour == 24) {
+            hour = 12;
+        }
+
+        app.setStart(appointmentStarts.atTime(hour, minute, 0));
+
+       
         isPM = endDateMeridian.getValue().equals(rb.getString("pm"));
         hour = Integer.parseInt((String) endDateHour.getValue());
         minute = Integer.parseInt((String) endDateMinute.getValue());
@@ -119,11 +121,21 @@ public class AppointmentController extends SceneChangerController implements Ini
         if (isPM) {
             hour += 12;
         }
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        app.setEnd(calendar.getTime());
+        if (hour == 24) {
+            hour = 12;
+        }
+        app.setEnd(appointmentEnds.atTime(hour, minute, 0));
+
         app.setCustomer((Customer) customerSelect.getValue());
         app.setUser(c.getUser());
+        try {
+            DB.connect().upsertAppointment(app);
+        } catch (SQLException e) {
+            errorMessage(rb.getString("couldNotSaveCustomer"), e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            errorMessage(rb.getString("unknownError"), e);
+        }
         c.getUser().addAppointment(app);
         this.setScene("Main");
     }    
@@ -146,17 +158,15 @@ public class AppointmentController extends SceneChangerController implements Ini
         descriptionText.setText(app.getDescription());
         
         if(app.getStart() != null) {
-            LocalDate start = app.getStart().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            startDate.setValue(start);
-            startDateHour.setValue(start.format(DateTimeFormatter.ofPattern("h")));
-            startDateMinute.setValue(start.format(DateTimeFormatter.ofPattern("m")));
-            startDateMeridian.setValue(rb.getString(start.format(DateTimeFormatter.ofPattern("a"))));
+            startDate.setValue(app.getStart().toLocalDate());
+            startDateHour.setValue(app.getStart().format(DateTimeFormatter.ofPattern("h")));
+            startDateMinute.setValue(app.getStart().format(DateTimeFormatter.ofPattern("m")));
+            startDateMeridian.setValue(rb.getString(app.getStart().format(DateTimeFormatter.ofPattern("a")).toLowerCase()));
         }
         if (app.getEnd() != null) {
-            LocalDate end = app.getEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            startDateHour.setValue(end.format(DateTimeFormatter.ofPattern("h")));
-            startDateMinute.setValue(end.format(DateTimeFormatter.ofPattern("m")));
-            startDateMeridian.setValue(rb.getString(end.format(DateTimeFormatter.ofPattern("a"))));
+            endDateHour.setValue(app.getEnd().format(DateTimeFormatter.ofPattern("h")));
+            endDateMinute.setValue(app.getEnd().format(DateTimeFormatter.ofPattern("m")));
+            endDateMeridian.setValue(rb.getString(app.getEnd().format(DateTimeFormatter.ofPattern("a")).toLowerCase()));
         }
         if (app.getCustomer() != null) {
             customerSelect.setValue(app.getCustomer());

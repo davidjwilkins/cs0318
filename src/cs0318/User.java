@@ -5,10 +5,8 @@
  */
 package cs0318;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import javafx.collections.ObservableList;
@@ -78,7 +76,7 @@ public class User extends Entity {
         return this.appointments;
     }
     
-    public ObservableList<Appointment> getAppointments(Date d) {
+    public ObservableList<Appointment> getAppointments(LocalDate d) {
         return this.appointments.filtered((Appointment appointment) -> {
             return isSameDay(appointment.getStart(), d);
         }).sorted((Appointment a, Appointment b) -> {
@@ -86,17 +84,10 @@ public class User extends Entity {
         });
     }
     
-    private boolean isSameDay(Date date1, Date date2) {
-        Calendar calendar1 = Calendar.getInstance();
-        calendar1.setTime(date1);
-        Calendar calendar2 = Calendar.getInstance();
-        calendar2.setTime(date2);
-        boolean sameYear = calendar1.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR);
-        boolean sameMonth = calendar1.get(Calendar.MONTH) == calendar2.get(Calendar.MONTH);
-        boolean sameDay = calendar1.get(Calendar.DAY_OF_MONTH) == calendar2.get(Calendar.DAY_OF_MONTH);
-        return (sameDay && sameMonth && sameYear);
+    private boolean isSameDay(LocalDateTime date1, LocalDate date2) {
+        return date1.toLocalDate().getDayOfYear() == date2.getDayOfYear() &&
+                date1.getYear() == date2.getYear();
     }
-
 
     /**
      * @return the userId

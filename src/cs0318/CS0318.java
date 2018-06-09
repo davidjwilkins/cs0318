@@ -27,7 +27,8 @@ public class CS0318 extends Application {
 
     protected void initializeForLanguage(String language) throws Exception {
         Locale locale = new Locale(language, language.toUpperCase());
-        SceneChangerController appointmentController, customerController, loginController, mainController;
+        SceneChangerController appointmentController, customerController,
+                loginController, mainController, listCustomersController;
         scenes = new HashMap<>();
         controllers = new HashMap<>();
         FXMLLoader mainLoader = new FXMLLoader(getClass().getResource("Main.fxml"));
@@ -36,15 +37,19 @@ public class CS0318 extends Application {
         loginLoader.setResources(ResourceBundle.getBundle("resources.login", locale));
         FXMLLoader customerLoader = new FXMLLoader(getClass().getResource("Customer.fxml"));
         customerLoader.setResources(ResourceBundle.getBundle("resources.customer", locale));
+        FXMLLoader listCustomersLoader = new FXMLLoader(getClass().getResource("ListCustomers.fxml"));
+        listCustomersLoader.setResources(ResourceBundle.getBundle("resources.customer", locale));
         FXMLLoader appointmentLoader = new FXMLLoader(getClass().getResource("Appointment.fxml"));
         appointmentLoader.setResources(ResourceBundle.getBundle("resources.appointment", locale));
         scenes.put("Main", (Parent)mainLoader.load());
         scenes.put("Login", (Parent)loginLoader.load());
         scenes.put("Customer", (Parent)customerLoader.load());
+        scenes.put("List Customers", (Parent)listCustomersLoader.load());
         scenes.put("Appointment", (Parent)appointmentLoader.load());
         mainController = ((MainController)mainLoader.getController());
         loginController = ((LoginController)loginLoader.getController());
         customerController = ((CustomerController)customerLoader.getController());
+        listCustomersController = ((ListCustomersController)listCustomersLoader.getController());
         appointmentController = ((AppointmentController)appointmentLoader.getController());
         
         mainController.setSceneChanger(s -> this.setScene(s));
@@ -58,12 +63,14 @@ public class CS0318 extends Application {
             }
         });
         customerController.setSceneChanger(s -> this.setScene(s));
+        listCustomersController.setSceneChanger(s -> this.setScene(s));
         appointmentController.setSceneChanger(s -> this.setScene(s));
         
         controllers.put("Main", mainController);
         controllers.put("Login", loginController);
         controllers.put("Customer", customerController);
         controllers.put("Appointment", appointmentController);
+        controllers.put("List Customers", listCustomersController);
         
         scene = new Scene(scenes.get("Login"));
         System.out.println("Setting scene...");
