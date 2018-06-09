@@ -17,6 +17,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 
 /**
  * FXML Controller class
@@ -37,6 +40,9 @@ public class CustomerController extends SceneChangerController implements Initia
     
     @FXML
     protected ChoiceBox countrySelect, citySelect;
+    
+    @FXML RadioButton activeButton, inactiveButton;
+    @FXML ToggleGroup active;
     
     @FXML Label title;
     /**
@@ -62,6 +68,7 @@ public class CustomerController extends SceneChangerController implements Initia
             }
         });
         title.setText(rb.getString("create") + " " + rb.getString("customer"));
+        activeButton.setSelected(true);
     }    
     
     @FXML
@@ -71,23 +78,39 @@ public class CustomerController extends SceneChangerController implements Initia
     
     @FXML
     private void handleSaveAction(ActionEvent event) {
-        Customer customer = Context.getInstance().getCustomer();
-        Address address = customer.getAddress();
-        address.setAddress(addressText.getText());
-        address.setAddress2(address2Text.getText());
-        address.setCity((City) citySelect.getValue());
-        address.setPostalCode(postalCodeText.getText());
-        address.setPhone(phoneText.getText());
         try {
-            DB.connect().upsertAddress(address);
+            Customer customer = Context.getInstance().getCustomer();
             customer.setCustomerName(nameText.getText());
-            customer.setAddress(address);
-            DB.connect().upsertCustomer(customer);
-        } catch(SQLException e) {
-            errorMessage(rb.getString("couldNotSaveCustomer"), e);
+            customer.setActive(activeButton.isSelected());
+            Address address = customer.getAddress();
+            address.setAddress(addressText.getText());
+            address.setAddress2(address2Text.getText());
+            address.setCity((City) citySelect.getValue());
+            address.setPostalCode(postalCodeText.getText());
+            address.setPhone(phoneText.getText());
+            if (customer.getCustomerName().isEmpty()) {
+                throw new Exception("Customer name is required!");
+            } else if (address.getAddress().isEmpty()) {
+                throw new Exception("Address is required!");
+            } else if (address.getCity() == null) {
+                throw new Exception("City is required!");
+            } else if (address.getPostalCode().isEmpty()) {
+                throw new Exception("Postal code is required!");
+            } else if (address.getPhone().isEmpty()) {
+                throw new Exception("Phone number is required");
+            }
+            try {
+                DB.connect().upsertAddress(address);
+                customer.setAddress(address);
+                DB.connect().upsertCustomer(customer);
+            } catch(SQLException e) {
+                errorMessage(rb.getString("couldNotSaveCustomer"), e);
+            } catch (Exception e) {
+                e.printStackTrace();
+                errorMessage(rb.getString("unknownError"), e);
+            }
         } catch (Exception e) {
-            e.printStackTrace();
-            errorMessage(rb.getString("unknownError"), e);
+            errorMessage("Invalid Customer Data", e);
         }
         this.setScene("Main");
     }    
@@ -119,6 +142,8 @@ public class CustomerController extends SceneChangerController implements Initia
             } else {
                 citySelect.setDisable(false);
             }
+            activeButton.setSelected(c.isActive());
+            inactiveButton.setSelected(!c.isActive());
         }
     }
 }

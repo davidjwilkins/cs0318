@@ -5,7 +5,15 @@
  */
 package cs0318;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -53,11 +61,28 @@ public class LoginController extends SceneChangerController implements Initializ
         loginButton.setText(rb.getString("loggingIn"));
         try {
             db.login(user);
+            Appointment upcoming = user.getUpcomingAppointment();
+            if (upcoming != null) {
+                // using a lambda so I can change the message based on the
+                // appointment
+                this.warningMessage("Upcoming Appointment", () -> "You have an appointment with " +
+                        upcoming.getCustomer().getCustomerName() + " in the next 15 minutes");
+            }
             this.setScene("Main");
         } catch (SQLException e) {
             errorMessage(rb.getString("couldNotConnect"), e);
         } catch (Exception e) {
             errorMessage(rb.getString("invalidLogin"), e);
+        } finally {
+            Path path = Paths.get("./logins.log");
+            try (BufferedWriter writer = Files.newBufferedWriter(path,
+                     Charset.forName("UTF-16"), StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+               writer.write(user.getUserName() + (user.getUserId() == 0 ? " failed to login" : " logged in") + 
+                       " at " + ((Long)System.currentTimeMillis()).toString() + "\n");
+            } catch (IOException e) {
+               // Handle file I/O exception...
+               errorMessage("Error writing to log", e);
+            }
         }
         loginButton.setText(originalText);
         loginButton.setDisable(false);
@@ -67,8 +92,8 @@ public class LoginController extends SceneChangerController implements Initializ
     public void initialize(URL url, ResourceBundle rb) {
         this.db = DB.connect();
         this.rb = rb;
-        englishButton.setSelected(rb.getLocale().getLanguage() == "en");
-        russianButton.setSelected(rb.getLocale().getLanguage() == "ru");
+        englishButton.setSelected(rb.getLocale().getLanguage().equals("en"));
+        russianButton.setSelected(rb.getLocale().getLanguage().equals("ru"));
         lang.selectedToggleProperty().addListener(new ChangeListener<Toggle>(){
             @Override
             public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {

@@ -35,6 +35,14 @@ abstract public class SceneChangerController implements SceneChangerInterface {
         errorAlert.setHeaderText(title);
         errorAlert.setContentText(e.getMessage());
         errorAlert.showAndWait();
+    } 
+    
+    interface Message { String getMessage(); }
+    protected void warningMessage(String title, Message e) {
+        Alert errorAlert = new Alert(Alert.AlertType.WARNING);
+        errorAlert.setHeaderText(title);
+        errorAlert.setContentText(e.getMessage());
+        errorAlert.showAndWait();
     }    
     abstract protected void refresh();
 }

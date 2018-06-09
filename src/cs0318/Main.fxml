@@ -56,6 +56,33 @@
                 fx:id="deleteAppointmentButton"
                 maxWidth="1000"
             />
+            <Pane
+                minHeight="20"
+                GridPane.columnIndex="0"
+                GridPane.rowIndex="5"
+                GridPane.rowSpan="2"
+            />
+            <Button 
+                GridPane.columnIndex="0"
+                GridPane.rowIndex="7"
+                text="Appointments By Month" 
+                fx:id="reportByMonth"
+                maxWidth="1000"
+            />
+            <Button 
+                GridPane.columnIndex="0"
+                GridPane.rowIndex="8"
+                text="Consultant Schedule" 
+                fx:id="reportByConsultant"
+                maxWidth="1000"
+            />
+            <Button 
+                GridPane.columnIndex="0"
+                GridPane.rowIndex="9"
+                text="Appointments By Type" 
+                fx:id="appointmentsByType"
+                maxWidth="1000"
+            />
             </VBox>
         </GridPane>
         <Button

@@ -30,6 +30,7 @@ public class Address extends Entity {
         this.city = new City();
         this.customers = FXCollections.observableArrayList();
         this.customerIds = new HashMap<>();
+        // using a lambda so I don't have to instantiate a class
         customers.addListener((ListChangeListener<Customer>) c -> {
             while (c.next()) {
                 if (c.wasPermutated()) {

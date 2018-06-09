@@ -10,11 +10,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
-import java.util.TimeZone;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -85,6 +81,12 @@ public class AppointmentController extends SceneChangerController implements Ini
     }
     
     @FXML
+    private void gotoCustomer(ActionEvent event) {
+        Context.getInstance().setCustomer(selectedCustomer);
+        this.setScene("Customer");
+    }
+    
+    @FXML
     private void handleSaveAction(ActionEvent event) {
         Context c = Context.getInstance();
         Appointment app = c.getAppointment();
@@ -109,7 +111,7 @@ public class AppointmentController extends SceneChangerController implements Ini
             hour = 12;
         }
 
-        app.setStart(appointmentStarts.atTime(hour, minute, 0));
+        app.setStart(appointmentStarts.atTime(hour, minute, 0).atZone(ZoneId.systemDefault()));
 
        
         isPM = endDateMeridian.getValue().equals(rb.getString("pm"));
@@ -124,20 +126,38 @@ public class AppointmentController extends SceneChangerController implements Ini
         if (hour == 24) {
             hour = 12;
         }
-        app.setEnd(appointmentEnds.atTime(hour, minute, 0));
-
-        app.setCustomer((Customer) customerSelect.getValue());
-        app.setUser(c.getUser());
+        app.setEnd(appointmentEnds.atTime(hour, minute, 0).atZone(ZoneId.systemDefault()));
         try {
-            DB.connect().upsertAppointment(app);
-        } catch (SQLException e) {
-            errorMessage(rb.getString("couldNotSaveCustomer"), e);
-        } catch (Exception e) {
-            e.printStackTrace();
-            errorMessage(rb.getString("unknownError"), e);
+            if (app.getStart().getHour() < 9 || app.getStart().getHour() > 6|| (
+                     app.getStart().getHour() == 6 && app.getStart().getMinute() > 0)) {
+                throw new Exception("Start time must be during normal business hours (9AM - 5PM)");
+            }
+             if (app.getEnd().getHour() < 9 || app.getEnd().getHour() > 6 || (
+                     app.getEnd().getHour() == 6 && app.getEnd().getMinute() > 0)) {
+                throw new Exception("End time must be during normal business hours (9AM - 5PM)");
+            }
+            app.setCustomer((Customer) customerSelect.getValue());
+            app.setUser(c.getUser());
+            if (c.getUser().hasOverlappingAppointment(app)) {
+                c.getUser().getAppointments().remove(app);
+                throw new Exception("This appointment would overlap an existing one!");
+            }
+            if (app.getStart().isAfter(app.getEnd())) {
+                throw new Exception("Appointment must end after it starts");
+            }
+            try {
+                DB.connect().upsertAppointment(app);
+            } catch (SQLException e) {
+                errorMessage(rb.getString("couldNotSaveAppointment"), e);
+            } catch (Exception e) {
+                e.printStackTrace();
+                errorMessage(rb.getString("unknownError"), e);
+            }
+            c.getUser().addAppointment(app);
+            this.setScene("Main");
+        } catch(Exception e) {
+            errorMessage("Invalid Appointment", e);
         }
-        c.getUser().addAppointment(app);
-        this.setScene("Main");
     }    
     
     @Override

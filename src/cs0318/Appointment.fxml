@@ -30,9 +30,16 @@
         <ChoiceBox 
             GridPane.columnIndex="1"
             GridPane.rowIndex="1"
-            GridPane.columnSpan="3"
+            GridPane.columnSpan="2"
             fx:id="customerSelect"
         />
+        <Button
+            text="View Customer"
+            onAction="#gotoCustomer"
+            GridPane.rowIndex="1"
+            GridPane.columnIndex="3"
+        />
+            
         <Label
             GridPane.columnIndex="0"
             GridPane.rowIndex="2"

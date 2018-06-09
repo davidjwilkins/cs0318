@@ -104,16 +104,33 @@
             GridPane.rowIndex="8"
             fx:id="phoneText"
         />
-        <Button
+        <fx:define>
+            <ToggleGroup fx:id="active"/>
+        </fx:define>
+        <RadioButton 
+            text="Active" 
+            fx:id="activeButton" 
+            toggleGroup="$active"
             GridPane.columnIndex="0"
             GridPane.rowIndex="9"
+        />
+        <RadioButton 
+            text="Inactive" 
+            fx:id="inactiveButton"
+            toggleGroup="$active"
+            GridPane.columnIndex="1"
+            GridPane.rowIndex="9"
+        />
+        <Button
+            GridPane.columnIndex="0"
+            GridPane.rowIndex="10"
             text="%cancel"
             fx:id="cancelButton"
             onAction="#handleCancelAction"
         />
         <Button
             GridPane.columnIndex="1"
-            GridPane.rowIndex="9"
+            GridPane.rowIndex="10"
             text="%save"
             fx:id="saveButton"
             onAction="#handleSaveAction"

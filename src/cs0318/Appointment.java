@@ -6,6 +6,7 @@
 package cs0318;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -22,8 +23,8 @@ public class Appointment extends Entity {
     private String contact = "";
     private String type = "";
     private String url = "";
-    private LocalDateTime start;
-    private LocalDateTime end;
+    private ZonedDateTime start;
+    private ZonedDateTime end;
     private User user;
     private Customer customer;
     
@@ -184,28 +185,28 @@ public class Appointment extends Entity {
     /**
      * @return the start
      */
-    public LocalDateTime getStart() {
+    public ZonedDateTime getStart() {
         return start;
     }
 
     /**
      * @param start the start to set
      */
-    public void setStart(LocalDateTime start) {
+    public void setStart(ZonedDateTime start) {
         this.start = start;
     }
 
     /**
      * @return the end
      */
-    public LocalDateTime getEnd() {
+    public ZonedDateTime getEnd() {
         return end;
     }
 
     /**
      * @param end the end to set
      */
-    public void setEnd(LocalDateTime end) {
+    public void setEnd(ZonedDateTime end) {
         this.end = end;
     }
     

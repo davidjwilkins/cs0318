@@ -11,7 +11,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.ZoneId;
 import java.util.HashMap;
+import java.util.function.BiConsumer;
 
 public class DB {
     
@@ -36,7 +38,7 @@ public class DB {
             statements.put("cities", connection.prepareStatement("SELECT * FROM city"));
             statements.put("customers", connection.prepareStatement("SELECT * FROM customer"));
             statements.put("addresses", connection.prepareStatement("SELECT * FROM address"));
-            statements.put("appointments", connection.prepareStatement("SELECT * FROM appointment"));
+            statements.put("appointments", connection.prepareStatement("SELECT * FROM appointment WHERE userId = ?"));
             statements.put("insertCustomer", connection.prepareStatement("INSERT INTO customer(customerName, addressId, active, createDate, createdBy, lastUpdateBy) "
                     + "VALUES(?, ?, ?, NOW(), ?, '')", Statement.RETURN_GENERATED_KEYS));
             statements.put("updateCustomer", connection.prepareStatement("UPDATE customer SET customerName = ?, addressId = ?, active = ?, lastUpdate = NOW(), lastUpdateBy = ? "
@@ -46,7 +48,7 @@ public class DB {
             statements.put("updateAddress", connection.prepareStatement("UPDATE address SET address = ?, address2 = ?, cityId = ?, postalCode = ?, phone = ?, "
                     + "lastUpdate = NOW(), lastUpdateBy = ? WHERE addressId = ?"));
             statements.put("insertAppointment", connection.prepareStatement("INSERT INTO appointment(customerId, title, description, location, contact, url, start, end, createDate,"
-                    + " createdBy, lastUpdateBy) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, '')", Statement.RETURN_GENERATED_KEYS));
+                    + " createdBy, lastUpdateBy, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, '', ?)", Statement.RETURN_GENERATED_KEYS));
             statements.put("updateAppointment", connection.prepareStatement("UPDATE appointment SET customerId = ?, title = ?, description = ?, location = ?, contact = ?, url = ?, "
                     + "start = ?, end = ?, lastUpdate = NOW(), lastUpdateBy = ? WHERE appointmentId = ?"));
             statements.put("deleteAppointment", connection.prepareStatement("DELETE FROM appointment WHERE appointmentId = ?"));
@@ -74,18 +76,19 @@ public class DB {
         PreparedStatement s = (PreparedStatement) statements.get("login");
         s.setString(1, user.getUserName());
         s.setString(2, user.getPassword());
-        ResultSet exists = s.executeQuery();
-        if(exists.next()){
-            user.setUserId(exists.getInt("userId"));
-            Context.getInstance().setUser(user);
-            try {
+        try (ResultSet exists = s.executeQuery()) {
+            if(exists.next()){
+                user.setUserId(exists.getInt("userId"));
+                exists.close();
+                Context.getInstance().setUser(user);
                 populate();
-            } catch(Exception e) {
-                e.printStackTrace();
-                throw new Exception("Error populating from database: " + e.getMessage());
+            } else {
+                exists.close();
+                throw new Exception("This username/password combination does not exist");
             }
-        } else {
-            throw new Exception("This username/password combination does not exist");
+        } catch(Exception e) {
+            e.printStackTrace();
+            throw new Exception("Error: " + e.getMessage());
         }
     }
     
@@ -107,11 +110,14 @@ public class DB {
             ResultSet exists = s.getGeneratedKeys();
             if(exists.next()){
                 customer.setAddressId(exists.getInt(1));
+                exists.close();
             } else {
+                exists.close();
                 throw new Exception("Could not create/update customer");
             }
         }
-        Context.getInstance().addCustomer(customer);
+        if (!Context.getInstance().getCustomers().contains(customer))
+            Context.getInstance().addCustomer(customer);
     }
     
     public void upsertAddress(Address address) throws SQLException, Exception {
@@ -133,7 +139,9 @@ public class DB {
             ResultSet exists = s.getGeneratedKeys();
             if(exists.next()){
                 address.setAddressId(exists.getInt(1));
+                exists.close();
             } else {
+                exists.close();
                 throw new Exception("Could not create/update address");
             }
         }
@@ -143,6 +151,7 @@ public class DB {
         PreparedStatement s;
         if (appointment.getAppointmentId() == 0) {
             s = (PreparedStatement) statements.get("insertAppointment");
+            s.setInt(10, Context.getInstance().getUser().getUserId());
         } else {
             s = (PreparedStatement) statements.get("updateAppointment");
             s.setInt(10, appointment.getAppointmentId());
@@ -154,15 +163,17 @@ public class DB {
         s.setString(4, appointment.getLocation());
         s.setString(5, appointment.getContact());
         s.setString(6, appointment.getUrl());
-        s.setTimestamp(7, java.sql.Timestamp.valueOf(appointment.getStart()));
-        s.setTimestamp(8, java.sql.Timestamp.valueOf(appointment.getEnd()));
+        s.setTimestamp(7, java.sql.Timestamp.valueOf(appointment.getStart().toLocalDateTime()));
+        s.setTimestamp(8, java.sql.Timestamp.valueOf(appointment.getEnd().toLocalDateTime()));
         s.setString(9, Context.getInstance().getUser().getUserName());
         s.executeUpdate();
         if (appointment.getAppointmentId() == 0) {
             ResultSet exists = s.getGeneratedKeys();
             if(exists.next()){
                 appointment.setAppointmentId(exists.getInt(1));
+                exists.close();
             } else {
+                exists.close();
                 throw new Exception("Could not create/update appointment");
             }
         }
@@ -214,7 +225,7 @@ public class DB {
             context.getCountries().add(c);
             countryMap.put(c.getCountryId(), c);
         }
-        
+        countries.close();
         HashMap<Integer, City> cityMap = new HashMap<>();
         ResultSet cities = citiesQuery.executeQuery();
         while(cities.next()) {
@@ -226,7 +237,7 @@ public class DB {
             ((Country) countryMap.get(countryId)).addCity(c);
             cityMap.put(c.getCityId(), c);
         }
-        
+        cities.close();
         HashMap<Integer, Address> addressMap = new HashMap<>();
         ResultSet addresses = addressesQuery.executeQuery();
         while(addresses.next()) {
@@ -241,7 +252,7 @@ public class DB {
             a.setPostalCode(addresses.getString("postalCode"));
             addressMap.put(a.getAddressId(), a);
         }
-        
+        addresses.close();
         HashMap<Integer, Customer> customerMap = new HashMap<>();
         ResultSet customers = customersQuery.executeQuery();
         while(customers.next()) {
@@ -255,7 +266,9 @@ public class DB {
             customerMap.put(customerId, c);
             context.addCustomer(c);
         }
+        customers.close();
         PreparedStatement appointmentsQuery = (PreparedStatement) statements.get("appointments");
+        appointmentsQuery.setInt(1, Context.getInstance().getUser().getUserId());
         ResultSet appointments = appointmentsQuery.executeQuery();
         while(appointments.next()) {
             Appointment a = new Appointment();
@@ -265,18 +278,26 @@ public class DB {
             a.setCreatedBy(appointments.getString("createdBy"));
             a.setCustomer(customerMap.get(appointments.getInt("customerId")));
             a.setDescription(appointments.getString("description"));
-            a.setEnd(appointments.getTimestamp("end").toLocalDateTime());
-            a.setStart(appointments.getTimestamp("start").toLocalDateTime());
+            a.setEnd(appointments.getTimestamp("end").toLocalDateTime().atZone(ZoneId.systemDefault()));
+            a.setStart(appointments.getTimestamp("start").toLocalDateTime().atZone(ZoneId.systemDefault()));
             a.setTitle(appointments.getString("title"));
             a.setUrl(appointments.getString("url"));
             a.setUser(context.getUser());
         }
+        appointments.close();
+    }
+    
+    public void closeStatement(String key, PreparedStatement s) throws SQLException {
+        s.close();
     }
     //Closes connections
     public void close(){
         try{
             connection.close();
-        }catch (Exception e){
+            for (HashMap.Entry<String, PreparedStatement> key : statements.entrySet()) {
+                key.getValue().close();
+            }
+        } catch (Exception e){
             e.printStackTrace();
         }
         finally{

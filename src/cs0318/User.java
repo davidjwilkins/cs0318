@@ -6,9 +6,7 @@
 package cs0318;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.ZonedDateTime;
 import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
 import java.util.HashMap;
@@ -84,7 +82,7 @@ public class User extends Entity {
         });
     }
     
-    private boolean isSameDay(LocalDateTime date1, LocalDate date2) {
+    private boolean isSameDay(ZonedDateTime date1, LocalDate date2) {
         return date1.toLocalDate().getDayOfYear() == date2.getDayOfYear() &&
                 date1.getYear() == date2.getYear();
     }
@@ -143,5 +141,35 @@ public class User extends Entity {
      */
     public void setActive(boolean active) {
         this.active = active;
+    }
+    
+    public boolean hasOverlappingAppointment(Appointment a) {
+        for (Appointment b: this.getAppointments()) {
+            if (a.equals(b)) {
+                continue;
+            }
+            if (a.getStart().isEqual(b.getStart()) || b.getEnd().isEqual(b.getEnd())) {
+                return true;
+            }
+            if (a.getEnd().isAfter(b.getStart()) && a.getEnd().isBefore(b.getEnd())) {
+                return true;
+            }
+            if (a.getStart().isBefore(b.getEnd()) && a.getStart().isAfter(b.getStart())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public Appointment getUpcomingAppointment() {
+        long current = System.currentTimeMillis();
+        for (Appointment a: this.getAppointments()) {
+            long appointment = a.getStart().toInstant().toEpochMilli();
+            long difference = appointment - current;
+            if (difference >= 0 && difference <= (15 * 60 * 1000)) {
+                return a;
+            }
+        }
+        return null;
     }
 }

@@ -16,10 +16,10 @@ import javafx.collections.ListChangeListener;
  */
 public class Customer extends Entity {
     private int customerId;
-    private String customerName;
+    private String customerName = "";
     private int addressId;
     private Address address;
-    private boolean active;
+    private boolean active = true;
     private ObservableList<Appointment> appointments;
     private HashMap<Integer, Appointment> appointmentIds;
     

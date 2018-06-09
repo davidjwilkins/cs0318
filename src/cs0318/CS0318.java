@@ -51,7 +51,7 @@ public class CS0318 extends Application {
         customerController = ((CustomerController)customerLoader.getController());
         listCustomersController = ((ListCustomersController)listCustomersLoader.getController());
         appointmentController = ((AppointmentController)appointmentLoader.getController());
-        
+        // using a lambda so I can effectivly pass methods from here to other controllers
         mainController.setSceneChanger(s -> this.setScene(s));
         loginController.setSceneChanger(s -> this.setScene(s));
         ((LoginController) loginController).setLangChanger(lang -> {
