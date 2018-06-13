@@ -65,7 +65,7 @@ public class AppointmentController extends SceneChangerController implements Ini
         });
         idText.setDisable(true);
         ObservableList<String> hours = FXCollections.observableArrayList("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
-        ObservableList<String> minutes = FXCollections.observableArrayList("05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60");
+        ObservableList<String> minutes = FXCollections.observableArrayList("00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55");
         ObservableList<String> meridians = FXCollections.observableArrayList(rb.getString("am"), rb.getString("pm"));
         startDateHour.setItems(hours);
         endDateHour.setItems(hours);
@@ -128,13 +128,13 @@ public class AppointmentController extends SceneChangerController implements Ini
         }
         app.setEnd(appointmentEnds.atTime(hour, minute, 0).atZone(ZoneId.systemDefault()));
         try {
-            if (app.getStart().getHour() < 9 || app.getStart().getHour() > 6|| (
-                     app.getStart().getHour() == 6 && app.getStart().getMinute() > 0)) {
-                throw new Exception("Start time must be during normal business hours (9AM - 5PM)");
+            if (app.getStart().getHour() < 9 || app.getStart().getHour() > 18|| (
+                     app.getStart().getHour() == 18 && app.getStart().getMinute() > 0)) {
+                throw new Exception("Start time must be during normal business hours (9AM - 6PM)");
             }
-             if (app.getEnd().getHour() < 9 || app.getEnd().getHour() > 6 || (
-                     app.getEnd().getHour() == 6 && app.getEnd().getMinute() > 0)) {
-                throw new Exception("End time must be during normal business hours (9AM - 5PM)");
+             if (app.getEnd().getHour() < 9 || app.getEnd().getHour() > 18 || (
+                     app.getEnd().getHour() == 18 && app.getEnd().getMinute() > 0)) {
+                throw new Exception("End time must be during normal business hours (9AM - 6PM)");
             }
             app.setCustomer((Customer) customerSelect.getValue());
             app.setUser(c.getUser());

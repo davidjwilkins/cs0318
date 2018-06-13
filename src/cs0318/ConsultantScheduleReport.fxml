@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<GridPane hgap="10" vgap="10" id="LoginPane" prefHeight="460" prefWidth="320" xmlns:fx="http://javafx.com/fxml/1"  fx:controller="cs0318.ConsultantScheduleReportController">
+    <padding><Insets top="25" right="25" bottom="10" left="25"/></padding>
+    <Label
+        text="Consultant Scedule"
+        GridPane.rowIndex="0"
+        GridPane.columnIndex="0"
+        GridPane.columnSpan="2"
+    />
+    <Label
+        text="Date"
+        GridPane.rowIndex="1"
+        GridPane.columnIndex="0"
+    />
+    <DatePicker
+        fx:id="scheduleDate"
+        GridPane.rowIndex="1"
+        GridPane.columnIndex="1"
+        onAction="#setDate"
+    />
+    <GridPane
+        fx:id="schedule"
+        GridPane.rowIndex="2"
+        GridPane.columnIndex="0"
+        GridPane.columnSpan="2"
+    />
+    <Button
+        text="Cancel"
+        onAction="#goBack"
+        GridPane.rowIndex="3"
+        GridPane.columnIndex="0"
+    />
+</GridPane>

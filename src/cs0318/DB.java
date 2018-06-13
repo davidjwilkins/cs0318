@@ -14,6 +14,8 @@ import java.sql.Statement;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.function.BiConsumer;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class DB {
     
@@ -33,12 +35,14 @@ public class DB {
         }
         System.out.println("Connected!");
          try {
+            statements.put("users", connection.prepareStatement("SELECT * FROM user"));
             statements.put("login", connection.prepareStatement("SELECT * FROM user WHERE userName=? AND password=?"));
             statements.put("countries", connection.prepareStatement("SELECT * FROM country"));
             statements.put("cities", connection.prepareStatement("SELECT * FROM city"));
             statements.put("customers", connection.prepareStatement("SELECT * FROM customer"));
             statements.put("addresses", connection.prepareStatement("SELECT * FROM address"));
-            statements.put("appointments", connection.prepareStatement("SELECT * FROM appointment WHERE userId = ?"));
+            statements.put("appointments", connection.prepareStatement("SELECT * FROM appointment"));
+            statements.put("userAppointments", connection.prepareStatement("SELECT * FROM appointment WHERE userId = ?"));
             statements.put("insertCustomer", connection.prepareStatement("INSERT INTO customer(customerName, addressId, active, createDate, createdBy, lastUpdateBy) "
                     + "VALUES(?, ?, ?, NOW(), ?, '')", Statement.RETURN_GENERATED_KEYS));
             statements.put("updateCustomer", connection.prepareStatement("UPDATE customer SET customerName = ?, addressId = ?, active = ?, lastUpdate = NOW(), lastUpdateBy = ? "
@@ -48,9 +52,9 @@ public class DB {
             statements.put("updateAddress", connection.prepareStatement("UPDATE address SET address = ?, address2 = ?, cityId = ?, postalCode = ?, phone = ?, "
                     + "lastUpdate = NOW(), lastUpdateBy = ? WHERE addressId = ?"));
             statements.put("insertAppointment", connection.prepareStatement("INSERT INTO appointment(customerId, title, description, location, contact, url, start, end, createDate,"
-                    + " createdBy, lastUpdateBy, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, '', ?)", Statement.RETURN_GENERATED_KEYS));
+                    + " createdBy, lastUpdateBy, userId, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, '', ?, ?)", Statement.RETURN_GENERATED_KEYS));
             statements.put("updateAppointment", connection.prepareStatement("UPDATE appointment SET customerId = ?, title = ?, description = ?, location = ?, contact = ?, url = ?, "
-                    + "start = ?, end = ?, lastUpdate = NOW(), lastUpdateBy = ? WHERE appointmentId = ?"));
+                    + "start = ?, end = ?, lastUpdate = NOW(), lastUpdateBy = ?, type = ? WHERE appointmentId = ?"));
             statements.put("deleteAppointment", connection.prepareStatement("DELETE FROM appointment WHERE appointmentId = ?"));
             statements.put("deleteCustomer", connection.prepareStatement("DELETE FROM customer WHERE customerId = ?"));
             statements.put("deleteCustomerAppointments", connection.prepareStatement("DELETE FROM appointment WHERE customerId = ?"));
@@ -76,6 +80,7 @@ public class DB {
         PreparedStatement s = (PreparedStatement) statements.get("login");
         s.setString(1, user.getUserName());
         s.setString(2, user.getPassword());
+        // Try with resources...
         try (ResultSet exists = s.executeQuery()) {
             if(exists.next()){
                 user.setUserId(exists.getInt("userId"));
@@ -152,9 +157,11 @@ public class DB {
         if (appointment.getAppointmentId() == 0) {
             s = (PreparedStatement) statements.get("insertAppointment");
             s.setInt(10, Context.getInstance().getUser().getUserId());
+            s.setString(11, appointment.getType());
         } else {
             s = (PreparedStatement) statements.get("updateAppointment");
-            s.setInt(10, appointment.getAppointmentId());
+            s.setString(10, appointment.getType());
+            s.setInt(11, appointment.getAppointmentId());
         }
         //(customerId, title, description, location, contact, url, start, end, createDate, createdBy)
         s.setInt(1, appointment.getCustomerId());
@@ -166,6 +173,7 @@ public class DB {
         s.setTimestamp(7, java.sql.Timestamp.valueOf(appointment.getStart().toLocalDateTime()));
         s.setTimestamp(8, java.sql.Timestamp.valueOf(appointment.getEnd().toLocalDateTime()));
         s.setString(9, Context.getInstance().getUser().getUserName());
+        
         s.executeUpdate();
         if (appointment.getAppointmentId() == 0) {
             ResultSet exists = s.getGeneratedKeys();
@@ -214,6 +222,9 @@ public class DB {
         PreparedStatement citiesQuery = (PreparedStatement) statements.get("cities");
         PreparedStatement addressesQuery = (PreparedStatement) statements.get("addresses");
         PreparedStatement customersQuery = (PreparedStatement) statements.get("customers");
+        PreparedStatement appointmentsQuery = (PreparedStatement) statements.get("userAppointments");
+        PreparedStatement usersQuery = (PreparedStatement) statements.get("users");
+        
         Context context = Context.getInstance();
         
         ResultSet countries = countriesQuery.executeQuery();
@@ -267,7 +278,8 @@ public class DB {
             context.addCustomer(c);
         }
         customers.close();
-        PreparedStatement appointmentsQuery = (PreparedStatement) statements.get("appointments");
+        
+        
         appointmentsQuery.setInt(1, Context.getInstance().getUser().getUserId());
         ResultSet appointments = appointmentsQuery.executeQuery();
         while(appointments.next()) {
@@ -282,11 +294,49 @@ public class DB {
             a.setStart(appointments.getTimestamp("start").toLocalDateTime().atZone(ZoneId.systemDefault()));
             a.setTitle(appointments.getString("title"));
             a.setUrl(appointments.getString("url"));
+            a.setType(appointments.getString("type"));
             a.setUser(context.getUser());
         }
         appointments.close();
+        
+        ResultSet users = usersQuery.executeQuery();
+        while(users.next()) {
+            User u = new User();
+            u.setUserId(users.getInt("userId"));
+            u.setUserName(users.getString("userName"));
+            Context.getInstance().addUser(u);
+        }
+        users.close();
     }
     
+    public ObservableList getAllAppointments() throws SQLException {
+        PreparedStatement appointmentsQuery = statements.get("appointments");
+         ObservableList<Appointment> list = FXCollections.observableArrayList();
+        try (ResultSet appointments = appointmentsQuery.executeQuery()) {
+            while(appointments.next()) {
+                Appointment a = new Appointment();
+                a.setAppointmentId(appointments.getInt("appointmentId"));
+                a.setContact(appointments.getString("contact"));
+                a.setCreateDate(appointments.getDate("createDate"));
+                a.setCreatedBy(appointments.getString("createdBy"));
+                a.setCustomerId(appointments.getInt("customerId"));
+                ObservableList<Customer> customerList = Context.getInstance().getCustomers().filtered(c -> c.getCustomerId() == a.getCustomerId());
+                if (customerList.size() > 0) {
+                    Customer customer = (Customer) customerList.get(0);
+                    a.setCustomer(customer);
+                }
+                a.setDescription(appointments.getString("description"));
+                a.setEnd(appointments.getTimestamp("end").toLocalDateTime().atZone(ZoneId.systemDefault()));
+                a.setStart(appointments.getTimestamp("start").toLocalDateTime().atZone(ZoneId.systemDefault()));
+                a.setTitle(appointments.getString("title"));
+                a.setUrl(appointments.getString("url"));
+                a.setUserId(appointments.getInt("userId"));
+                a.setType(appointments.getString("type"));
+                list.add(a);
+            }
+        }
+        return list;
+    }
     public void closeStatement(String key, PreparedStatement s) throws SQLException {
         s.close();
     }

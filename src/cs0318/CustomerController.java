@@ -56,11 +56,13 @@ public class CustomerController extends SceneChangerController implements Initia
         // TODO
         idText.setDisable(true);
         countrySelect.getSelectionModel().selectedIndexProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-            Country country = (Country) countrySelect.getItems().get((Integer) newValue);
+            if (!newValue.equals(-1)) {
+                Country country = (Country) countrySelect.getItems().get((Integer) newValue);
+                citySelect.setItems(country.getCities());
+                this.selectedCountry = country;
+            }
             citySelect.setValue(null);
-            citySelect.setItems(country.getCities());
             citySelect.setDisable(false);
-            this.selectedCountry = country;
         });
         citySelect.getSelectionModel().selectedIndexProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
             if (!newValue.equals(-1)) {
@@ -130,7 +132,7 @@ public class CustomerController extends SceneChangerController implements Initia
             nameText.setText(c.getCustomerName());
             addressText.setText(c.getAddress().getAddress());
             address2Text.setText(c.getAddress().getAddress2());
-            citySelect.setValue(c.getAddress().getCity());
+            
             postalCodeText.setText(c.getAddress().getPostalCode());
             phoneText.setText(c.getAddress().getPhone());
             countrySelect.setItems(FXCollections.observableArrayList(Context.getInstance().getCountries()));

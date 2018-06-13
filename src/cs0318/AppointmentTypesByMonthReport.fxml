@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.*?>
+<GridPane hgap="10" vgap="10" id="LoginPane" prefHeight="460" prefWidth="320" xmlns:fx="http://javafx.com/fxml/1"  fx:controller="cs0318.AppointmentTypesByMonthReportController">
+    <padding><Insets top="25" right="25" bottom="10" left="25"/></padding>
+    <Label
+        text="Appointment Types By Month"
+        GridPane.rowIndex="0"
+        GridPane.columnIndex="0"
+    />
+        
+    <TableView fx:id="table"
+        GridPane.rowIndex="1"
+        GridPane.columnIndex="0"
+    >
+        <columns>
+          <TableColumn text="Month">
+            <cellValueFactory>
+              <PropertyValueFactory property="month" />
+            </cellValueFactory>
+          </TableColumn>
+          <TableColumn text="# of Appointments Types" minWidth="200">
+              <cellValueFactory>
+                <PropertyValueFactory property="numberOfAppointmentTypes" />
+              </cellValueFactory>
+          </TableColumn>
+        </columns>
+    </TableView>
+    <Button
+        text="Cancel"
+        onAction="#goBack"
+        GridPane.rowIndex="2"
+        GridPane.columnIndex="0"
+    />
+</GridPane>

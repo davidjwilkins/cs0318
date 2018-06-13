@@ -65,13 +65,15 @@
             <Button 
                 GridPane.columnIndex="0"
                 GridPane.rowIndex="7"
-                text="Appointments By Month" 
+                onAction="#appointmentsByMonthAction" 
+                text="Appointment Types By Month" 
                 fx:id="reportByMonth"
                 maxWidth="1000"
             />
             <Button 
                 GridPane.columnIndex="0"
                 GridPane.rowIndex="8"
+                onAction="#consultantScheduleAction" 
                 text="Consultant Schedule" 
                 fx:id="reportByConsultant"
                 maxWidth="1000"
@@ -79,6 +81,7 @@
             <Button 
                 GridPane.columnIndex="0"
                 GridPane.rowIndex="9"
+                onAction="#appointmentsByTypeAction" 
                 text="Appointments By Type" 
                 fx:id="appointmentsByType"
                 maxWidth="1000"

@@ -28,7 +28,9 @@ public class CS0318 extends Application {
     protected void initializeForLanguage(String language) throws Exception {
         Locale locale = new Locale(language, language.toUpperCase());
         SceneChangerController appointmentController, customerController,
-                loginController, mainController, listCustomersController;
+                loginController, mainController, listCustomersController,
+                appointmentsByMonthController, appointmentsByTypeController,
+                consultantScheduleController;
         scenes = new HashMap<>();
         controllers = new HashMap<>();
         FXMLLoader mainLoader = new FXMLLoader(getClass().getResource("Main.fxml"));
@@ -41,19 +43,29 @@ public class CS0318 extends Application {
         listCustomersLoader.setResources(ResourceBundle.getBundle("resources.customer", locale));
         FXMLLoader appointmentLoader = new FXMLLoader(getClass().getResource("Appointment.fxml"));
         appointmentLoader.setResources(ResourceBundle.getBundle("resources.appointment", locale));
+        FXMLLoader appointmentsByMonthLoader = new FXMLLoader(getClass().getResource("AppointmentTypesByMonthReport.fxml"));
+        FXMLLoader appointmentsByTypeLoader = new FXMLLoader(getClass().getResource("AppointmentsByTypeReport.fxml"));
+        FXMLLoader consultantScheduleLoader = new FXMLLoader(getClass().getResource("ConsultantScheduleReport.fxml"));
         scenes.put("Main", (Parent)mainLoader.load());
         scenes.put("Login", (Parent)loginLoader.load());
         scenes.put("Customer", (Parent)customerLoader.load());
         scenes.put("List Customers", (Parent)listCustomersLoader.load());
         scenes.put("Appointment", (Parent)appointmentLoader.load());
+        scenes.put("Appointments By Month", (Parent)appointmentsByMonthLoader.load());
+        scenes.put("Appointments By Type", (Parent)appointmentsByTypeLoader.load());
+        scenes.put("Consultant Schedule", (Parent)consultantScheduleLoader.load());
         mainController = ((MainController)mainLoader.getController());
         loginController = ((LoginController)loginLoader.getController());
         customerController = ((CustomerController)customerLoader.getController());
         listCustomersController = ((ListCustomersController)listCustomersLoader.getController());
         appointmentController = ((AppointmentController)appointmentLoader.getController());
+        appointmentsByMonthController = ((AppointmentTypesByMonthReportController)appointmentsByMonthLoader.getController());
+        appointmentsByTypeController = ((AppointmentsByTypeReportController)appointmentsByTypeLoader.getController());
+        consultantScheduleController = ((ConsultantScheduleReportController)consultantScheduleLoader.getController());
         // using a lambda so I can effectivly pass methods from here to other controllers
         mainController.setSceneChanger(s -> this.setScene(s));
         loginController.setSceneChanger(s -> this.setScene(s));
+        
         ((LoginController) loginController).setLangChanger(lang -> {
             try {
                 ResourceBundle.clearCache();
@@ -62,6 +74,9 @@ public class CS0318 extends Application {
                 e.printStackTrace();
             }
         });
+        appointmentsByMonthController.setSceneChanger(s -> this.setScene(s));
+        appointmentsByTypeController.setSceneChanger(s -> this.setScene(s));
+        consultantScheduleController.setSceneChanger(s -> this.setScene(s));
         customerController.setSceneChanger(s -> this.setScene(s));
         listCustomersController.setSceneChanger(s -> this.setScene(s));
         appointmentController.setSceneChanger(s -> this.setScene(s));
@@ -71,7 +86,9 @@ public class CS0318 extends Application {
         controllers.put("Customer", customerController);
         controllers.put("Appointment", appointmentController);
         controllers.put("List Customers", listCustomersController);
-        
+        controllers.put("Appointments By Month", appointmentsByMonthController);
+        controllers.put("Appointments By Type", appointmentsByTypeController);
+        controllers.put("Consultant Schedule", consultantScheduleController);
         scene = new Scene(scenes.get("Login"));
         System.out.println("Setting scene...");
         stage.setScene(scene);

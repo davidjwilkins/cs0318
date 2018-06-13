@@ -20,6 +20,7 @@ public class Context {
     protected Customer customer;
     protected ArrayList<Country> countries;
     protected ObservableList<Customer> customers;
+    protected ObservableList<User> users;
     protected ObservableList<Appointment> appointments;
     protected HashMap<Integer, Country> countryIds;
     
@@ -27,6 +28,7 @@ public class Context {
         if (instance == null) this.instance = this;       
         this.countries = new ArrayList<>();
         this.customers = FXCollections.observableArrayList();
+        this.users = FXCollections.observableArrayList();
     }
     
     public static Context getInstance()
@@ -50,7 +52,6 @@ public class Context {
     }
     
     public void addCustomer(Customer customer) {
-        System.out.println("Adding Customer " + customer.getCreatedBy());
         this.customers.add(customer);
     }
     
@@ -84,6 +85,14 @@ public class Context {
     
     public User getUser() {
         return user;
+    }
+    
+    public void addUser(User user) {
+        this.users.add(user);
+    }
+    
+    public ObservableList<User> getUsers() {
+        return users;
     }
     
 }

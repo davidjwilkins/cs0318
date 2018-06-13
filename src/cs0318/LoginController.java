@@ -72,6 +72,7 @@ public class LoginController extends SceneChangerController implements Initializ
         } catch (SQLException e) {
             errorMessage(rb.getString("couldNotConnect"), e);
         } catch (Exception e) {
+            e = new Exception(rb.getString("usernamePasswordError"));
             errorMessage(rb.getString("invalidLogin"), e);
         } finally {
             Path path = Paths.get("./logins.log");

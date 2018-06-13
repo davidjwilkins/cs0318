@@ -55,6 +55,13 @@ public class User extends Entity {
         }
     }
     
+    public void setAppointments(ObservableList<Appointment> appointments) {
+        this.appointments.clear();
+        for (Appointment a: appointments) {
+            this.appointments.add(a);
+        }
+    }
+    
     public Appointment getAppointment(int appointmentId) {
         return this.appointmentIds.get(appointmentId);
     }
@@ -145,16 +152,18 @@ public class User extends Entity {
     
     public boolean hasOverlappingAppointment(Appointment a) {
         for (Appointment b: this.getAppointments()) {
-            if (a.equals(b)) {
+            if (a.equals(b) || a.getAppointmentId() == b.getAppointmentId()) {
                 continue;
             }
-            if (a.getStart().isEqual(b.getStart()) || b.getEnd().isEqual(b.getEnd())) {
+            if (a.getStart().isEqual(b.getStart()) || a.getEnd().isEqual(b.getEnd())) {
                 return true;
             }
             if (a.getEnd().isAfter(b.getStart()) && a.getEnd().isBefore(b.getEnd())) {
+                System.out.println("b");
                 return true;
             }
             if (a.getStart().isBefore(b.getEnd()) && a.getStart().isAfter(b.getStart())) {
+                System.out.println("c");
                 return true;
             }
         }

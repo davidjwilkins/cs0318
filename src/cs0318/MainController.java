@@ -90,6 +90,24 @@ public class MainController extends SceneChangerController implements Initializa
     }
     
     @FXML
+    private void appointmentsByMonthAction(ActionEvent event) {
+        System.out.println("Setting scene");
+        this.setScene("Appointments By Month");
+    }
+    
+    
+    @FXML
+    private void appointmentsByTypeAction(ActionEvent event) {
+        this.setScene("Appointments By Type");
+    }
+    
+    @FXML
+    private void consultantScheduleAction(ActionEvent event) {
+        this.setScene("Consultant Schedule");
+    }
+    
+    
+    @FXML
     private void incrementMonth(ActionEvent event) {
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(calendarDate);
